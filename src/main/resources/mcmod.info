@@ -1,0 +1,10 @@
+[
+{
+  "modid": "nothirium",
+  "name": "Nothirium",
+  "version": "${version}",
+  "mcversion": "1.12.2",
+  "url": "https://github.com/Meldexun/Nothirium",
+  "authorList": ["Meldexun"]
+}
+]
