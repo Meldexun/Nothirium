@@ -29,6 +29,8 @@ import meldexun.renderlib.util.GLShader;
 import meldexun.renderlib.util.GLUtil;
 import meldexun.renderlib.util.PersistentBuffer;
 import meldexun.renderlib.util.RenderUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 
 public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
@@ -156,6 +158,9 @@ public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 
 	@Override
 	public void render(ChunkRenderPass pass) {
+		RenderHelper.disableStandardItemLighting();
+		Minecraft.getMinecraft().entityRenderer.enableLightmap();
+
 		GLShader.push();
 		shader.use();
 		GL30.glBindVertexArray(vaos.get().getInt(pass));
@@ -171,6 +176,8 @@ public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, 0);
 		GL30.glBindVertexArray(0);
 		GLShader.pop();
+
+		Minecraft.getMinecraft().entityRenderer.disableLightmap();
 	}
 
 	@Override
