@@ -33,7 +33,7 @@ public class RenderChunkDispatcher implements IRenderChunkDispatcher {
 
 	@Override
 	public <T> CompletableFuture<T> runAsync(Supplier<T> supplier) {
-		return CompletableFuture.supplyAsync(supplier, executor);
+		return crashMinecraftOnError(CompletableFuture.supplyAsync(supplier, executor));
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class RenderChunkDispatcher implements IRenderChunkDispatcher {
 
 	@Override
 	public CompletableFuture<Void> runAsync(Runnable runnable) {
-		return CompletableFuture.runAsync(runnable, executor);
+		return crashMinecraftOnError(CompletableFuture.runAsync(runnable, executor));
 	}
 
 	@Override
@@ -58,6 +58,14 @@ public class RenderChunkDispatcher implements IRenderChunkDispatcher {
 		} else {
 			return CompletableFuture.runAsync(runnable, this.taskQueue::add);
 		}
+	}
+
+	private static <T> CompletableFuture<T> crashMinecraftOnError(CompletableFuture<T> future) {
+		return future.whenCompleteAsync((r, t) -> {
+			if (t != null) {
+				Minecraft.getMinecraft().crashed(new CrashReport("Failed compiling chunk", t));
+			}
+		}, ForkJoinPool.commonPool());
 	}
 
 	@Override
