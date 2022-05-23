@@ -114,9 +114,6 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 					Chunk chunk = world.getChunk(chunkX + x, chunkZ + z);
 					this.chunks[(z + 1) * 3 + (x + 1)] = chunk;
 					for (int y = -1; y <= 1; y++) {
-						if ((x != 0 || z != 0) && y != 0) {
-							continue;
-						}
 						ExtendedBlockStorage blockStorage = chunkY + y >= 0 && chunkY + y < 16 ? chunk.getBlockStorageArray()[chunkY + y] : null;
 						this.blockStorages[((z + 1) * 3 + (y + 1)) * 3 + (x + 1)] = blockStorage;
 					}
