@@ -11,6 +11,8 @@ import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
+import meldexun.nothirium.mc.Nothirium;
+import meldexun.nothirium.mc.integration.BetterFoliage;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
 import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
@@ -95,7 +97,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 						}
 
 						for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
-							if (!blockState.getBlock().canRenderInLayer(blockState, layer)) {
+							if (Nothirium.isBetterFoliageInstalled ? !BetterFoliage.canRenderBlockInLayer(blockState.getBlock(), blockState, layer) : !blockState.getBlock().canRenderInLayer(blockState, layer)) {
 								continue;
 							}
 							ForgeHooksClient.setRenderLayer(layer);
@@ -104,7 +106,11 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 								bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 								bufferBuilder.setTranslation(-this.renderChunk.getX(), -this.renderChunk.getY(), -this.renderChunk.getZ());
 							}
-							mc.getBlockRendererDispatcher().renderBlock(blockState, pos, this.chunkCache, bufferBuilder);
+							if (Nothirium.isBetterFoliageInstalled) {
+								BetterFoliage.renderWorldBlock(mc.getBlockRendererDispatcher(), blockState, pos, this.chunkCache, bufferBuilder, layer);
+							} else {
+								mc.getBlockRendererDispatcher().renderBlock(blockState, pos, this.chunkCache, bufferBuilder);
+							}
 							ForgeHooksClient.setRenderLayer(null);
 						}
 					}
