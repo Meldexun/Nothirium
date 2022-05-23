@@ -12,6 +12,7 @@ import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
+import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
 import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VisibilityGraph;
@@ -89,7 +90,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 						}
 
 						for (Direction dir : Direction.ALL) {
-							if (blockState.doesSideBlockRendering(chunkCache, pos, null))
+							if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir)))
 								visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
 						}
 
