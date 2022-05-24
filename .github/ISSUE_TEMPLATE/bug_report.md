@@ -27,5 +27,11 @@ Forge:
 Minecraft: 
 Other mods (necessary to reproduce the bug): 
 
+**Hardware**
+CPU: 
+RAM: 
+GPU: 
+VRAM: 
+
 **Log File**
 Please use a paste site to upload the log file (for example https://gist.github.com/) and provide the link to the file here:
