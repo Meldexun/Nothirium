@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
-@Mod(modid = Nothirium.MODID, dependencies = "required:renderlib@[1.0.5,)")
+@Mod(modid = Nothirium.MODID, dependencies = "required:renderlib@[1.0.6,)")
 public class Nothirium {
 
 	public static final String MODID = "nothirium";

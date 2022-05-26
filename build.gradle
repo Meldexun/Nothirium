@@ -47,7 +47,7 @@ dependencies {
     implementation "org.spongepowered:mixin:${mixin_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 
-    atDependencies fg.deobf('meldexun:RenderLib:1.12.2-1.0.5@jar')
+    atDependencies fg.deobf('meldexun:RenderLib:1.12.2-1.0.6@jar')
 }
 
 minecraft {
