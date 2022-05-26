@@ -1,6 +1,5 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Objects;
 import java.util.function.ToIntFunction;
@@ -185,10 +184,9 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		GL30.glBindVertexArray(vaos.get().getInt(pass));
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, commandBuffers.get().get(pass).getBuffer());
 
-		int indirectBufferOffset = 0;
+		long indirectBufferOffset = 0;
 		if (pass == ChunkRenderPass.TRANSLUCENT) {
-			ByteBuffer translucentBuffer = commandBuffers.get().get(pass).getByteBuffer();
-			indirectBufferOffset = translucentBuffer.capacity() - chunkCounts.getInt(pass) * 16;
+			indirectBufferOffset = commandBuffers.get().get(pass).getSize() - chunkCounts.getInt(pass) * 16;
 		}
 		GL43.glMultiDrawArraysIndirect(GL11.GL_QUADS, indirectBufferOffset, chunkCounts.getInt(pass), 0);
 		if (pass == ChunkRenderPass.TRANSLUCENT) {
