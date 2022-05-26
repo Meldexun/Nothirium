@@ -35,12 +35,19 @@ import net.minecraft.util.ResourceLocation;
 
 public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 
+	private static final String U_BLOCKTEX = "u_BlockTex";
+	private static final String U_LIGHTTEX = "u_LightTex";
+	private static final String U_MATRIX = "u_ModelViewProjectionMatrix";
+	private static final String U_FOGMODE = "u_FogMode";
+	private static final String U_FOGSTART = "u_FogStart";
+	private static final String U_FOGEND = "u_FogEnd";
+	private static final String U_FOGCOLOR = "u_FogColor";
 	private final GLShader shader = new GLShader.Builder()
 			.addShader(GL20.GL_VERTEX_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_vert.glsl")))
 			.addShader(GL20.GL_FRAGMENT_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_frag.glsl")))
 			.build(p -> {
-				GL20.glUniform1i(p.getUniform("u_BlockTex"), 0);
-				GL20.glUniform1i(p.getUniform("u_LightTex"), 1);
+				GL20.glUniform1i(p.getUniform(U_BLOCKTEX), 0);
+				GL20.glUniform1i(p.getUniform(U_LIGHTTEX), 1);
 			});
 
 	private final MultiObject<Enum2IntMap<ChunkRenderPass>> vaos;
@@ -99,12 +106,12 @@ public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 		shader.use();
 		Matrix4f matrix = RenderUtil.getProjectionModelViewMatrix().copy();
 		matrix.translate((float) RenderUtil.getCameraOffsetX(), (float) RenderUtil.getCameraOffsetY(), (float) RenderUtil.getCameraOffsetZ());
-		GLUtil.setMatrix(shader.getUniform("u_ModelViewProjectionMatrix"), matrix);
-		GL20.glUniform1f(shader.getUniform("u_FogMode"), 1);
-		GL20.glUniform1f(shader.getUniform("u_FogStart"), GL11.glGetFloat(GL11.GL_FOG_START));
-		GL20.glUniform1f(shader.getUniform("u_FogEnd"), GL11.glGetFloat(GL11.GL_FOG_END));
+		GLUtil.setMatrix(shader.getUniform(U_MATRIX), matrix);
+		GL20.glUniform1f(shader.getUniform(U_FOGMODE), 1);
+		GL20.glUniform1f(shader.getUniform(U_FOGSTART), GL11.glGetFloat(GL11.GL_FOG_START));
+		GL20.glUniform1f(shader.getUniform(U_FOGEND), GL11.glGetFloat(GL11.GL_FOG_END));
 		Vector4f fogColor = GLUtil.getFloat4(GL11.GL_FOG_COLOR);
-		GL20.glUniform4f(shader.getUniform("u_FogColor"), fogColor.x, fogColor.y, fogColor.z, fogColor.w);
+		GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.x, fogColor.y, fogColor.z, fogColor.w);
 		GLShader.pop();
 
 		vaos.update();
