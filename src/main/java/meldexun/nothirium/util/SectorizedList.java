@@ -154,7 +154,7 @@ public class SectorizedList {
 		return this.sectorCount;
 	}
 
-	public class Sector implements Comparable<Sector> {
+	public static class Sector implements Comparable<Sector> {
 
 		private boolean claimed;
 		private int firstSector;
