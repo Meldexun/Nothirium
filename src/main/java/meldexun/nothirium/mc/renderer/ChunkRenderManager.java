@@ -6,7 +6,7 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.asm.NothiriumClassTransformer;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
-import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL45;
+import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL43;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererOptifine;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunk;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkDispatcher;
@@ -42,16 +42,16 @@ public class ChunkRenderManager {
 		if (chunkRenderer == null) {
 			if (NothiriumClassTransformer.OPTIFINE_DETECTED && IS_SHADERS.invoke(null)) {
 				chunkRenderer = new ChunkRendererOptifine();
-			} else if (Nothirium.isGL45Supported()) {
-				chunkRenderer = new ChunkRendererGL45(2);
+			} else if (Nothirium.isGL43Supported()) {
+				chunkRenderer = new ChunkRendererGL43(2);
 			} else {
 				chunkRenderer = new ChunkRendererGL20();
 			}
 		} else {
-			if (NothiriumClassTransformer.OPTIFINE_DETECTED && Nothirium.isGL45Supported()) {
+			if (NothiriumClassTransformer.OPTIFINE_DETECTED && Nothirium.isGL43Supported()) {
 				if (!IS_SHADERS.invoke(null) && chunkRenderer instanceof ChunkRendererOptifine) {
 					chunkRenderer.dispose();
-					chunkRenderer = new ChunkRendererGL45(2);
+					chunkRenderer = new ChunkRendererGL43(2);
 				} else if (IS_SHADERS.invoke(null) && !(chunkRenderer instanceof ChunkRendererOptifine)) {
 					chunkRenderer.dispose();
 					chunkRenderer = new ChunkRendererOptifine();

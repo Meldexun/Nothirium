@@ -16,17 +16,17 @@ public class Nothirium {
 
 	public static final String MODID = "nothirium";
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
-	private static boolean isOpenGL45Supported;
+	private static boolean isOpenGL43Supported;
 	public static boolean isBetterFoliageInstalled;
 
-	public static boolean isGL45Supported() {
-		return isOpenGL45Supported;
+	public static boolean isGL43Supported() {
+		return isOpenGL43Supported;
 	}
 
 	@EventHandler
 	public void onFMLConstructionEvent(FMLConstructionEvent event) {
 		GLHelper.init(GLContext.getCapabilities());
-		isOpenGL45Supported = GLContext.getCapabilities().OpenGL45;
+		isOpenGL43Supported = GLContext.getCapabilities().OpenGL43;
 	}
 
 	@EventHandler

@@ -33,7 +33,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 
-public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
+public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 	private static final String A_POS = "a_Pos";
 	private static final String A_COLOR = "a_Color";
@@ -68,7 +68,7 @@ public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 
 	private final MultiObject<GLSync> syncs;
 
-	public ChunkRendererGL45(int bufferCount) {
+	public ChunkRendererGL43(int bufferCount) {
 		this.vaos = new MultiObject<>(bufferCount, i -> new Enum2IntMap<>(ChunkRenderPass.class));
 		this.chunkCounts = new Enum2IntMap<>(ChunkRenderPass.class);
 		this.offsetBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
