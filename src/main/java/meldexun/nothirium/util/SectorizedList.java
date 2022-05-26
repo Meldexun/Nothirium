@@ -26,12 +26,7 @@ public class SectorizedList {
 	protected void grow(int minContinousSector) {
 		int oldCapacity = this.sectorCount;
 		int lastFreeSectorStart = !this.lastSector.claimed ? this.lastSector.firstSector : oldCapacity;
-		int newCapacity = oldCapacity;
-		while (newCapacity - lastFreeSectorStart < minContinousSector) {
-			newCapacity <<= 1;
-		}
-
-		this.sectorCount = newCapacity;
+		this.sectorCount = calculateNewCapacity(oldCapacity, lastFreeSectorStart, minContinousSector);
 
 		// update prev and next sectors and freeSectors list
 		if (!this.lastSector.claimed) {
@@ -45,6 +40,14 @@ public class SectorizedList {
 			this.lastSector = sector;
 			this.freeSectors.add(sector);
 		}
+	}
+
+	protected int calculateNewCapacity(int oldCapacity, int lastFreeSectorStart, int minContinousSector) {
+		int newCapacity = oldCapacity;
+		while (newCapacity - lastFreeSectorStart < minContinousSector) {
+			newCapacity += newCapacity >> 1;
+		}
+		return newCapacity;
 	}
 
 	public Sector claim(int sectorCount) {
