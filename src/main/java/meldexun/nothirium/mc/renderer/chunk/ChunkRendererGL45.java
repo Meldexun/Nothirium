@@ -35,6 +35,11 @@ import net.minecraft.util.ResourceLocation;
 
 public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 
+	private static final String A_POS = "a_Pos";
+	private static final String A_COLOR = "a_Color";
+	private static final String A_TEXCOORD = "a_TexCoord";
+	private static final String A_LIGHTCOORD = "a_LightCoord";
+	private static final String A_OFFSET = "a_Offset";
 	private static final String U_BLOCKTEX = "u_BlockTex";
 	private static final String U_LIGHTTEX = "u_LightTex";
 	private static final String U_MATRIX = "u_ModelViewProjectionMatrix";
@@ -45,6 +50,11 @@ public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 	private final GLShader shader = new GLShader.Builder()
 			.addShader(GL20.GL_VERTEX_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_vert.glsl")))
 			.addShader(GL20.GL_FRAGMENT_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_frag.glsl")))
+			.bindAttribute(A_POS, 0)
+			.bindAttribute(A_COLOR, 1)
+			.bindAttribute(A_TEXCOORD, 2)
+			.bindAttribute(A_LIGHTCOORD, 3)
+			.bindAttribute(A_OFFSET, 4)
 			.build(p -> {
 				GL20.glUniform1i(p.getUniform(U_BLOCKTEX), 0);
 				GL20.glUniform1i(p.getUniform(U_LIGHTTEX), 1);
@@ -82,18 +92,18 @@ public class ChunkRendererGL45 extends ChunkRendererDynamicVbo {
 			int vao = GL30.glGenVertexArrays();
 			GL30.glBindVertexArray(vao);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbos.get(pass).getVbo());
-			GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 28, 0);
-			GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_BYTE, true, 28, 12);
-			GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, false, 28, 16);
-			GL20.glVertexAttribPointer(3, 2, GL11.GL_SHORT, false, 28, 24);
+			GL20.glVertexAttribPointer(shader.getAttribute(A_POS), 3, GL11.GL_FLOAT, false, 28, 0);
+			GL20.glVertexAttribPointer(shader.getAttribute(A_COLOR), 4, GL11.GL_UNSIGNED_BYTE, true, 28, 12);
+			GL20.glVertexAttribPointer(shader.getAttribute(A_TEXCOORD), 2, GL11.GL_FLOAT, false, 28, 16);
+			GL20.glVertexAttribPointer(shader.getAttribute(A_LIGHTCOORD), 2, GL11.GL_SHORT, false, 28, 24);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, offsetBuffers.get(i).get(pass).getBuffer());
-			GL20.glVertexAttribPointer(4, 3, GL11.GL_FLOAT, false, 0, 0);
-			GL20.glEnableVertexAttribArray(0);
-			GL20.glEnableVertexAttribArray(1);
-			GL20.glEnableVertexAttribArray(2);
-			GL20.glEnableVertexAttribArray(3);
-			GL20.glEnableVertexAttribArray(4);
-			GL33.glVertexAttribDivisor(4, 1);
+			GL20.glVertexAttribPointer(shader.getAttribute(A_OFFSET), 3, GL11.GL_FLOAT, false, 0, 0);
+			GL20.glEnableVertexAttribArray(shader.getAttribute(A_POS));
+			GL20.glEnableVertexAttribArray(shader.getAttribute(A_COLOR));
+			GL20.glEnableVertexAttribArray(shader.getAttribute(A_TEXCOORD));
+			GL20.glEnableVertexAttribArray(shader.getAttribute(A_LIGHTCOORD));
+			GL20.glEnableVertexAttribArray(shader.getAttribute(A_OFFSET));
+			GL33.glVertexAttribDivisor(shader.getAttribute(A_OFFSET), 1);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 			GL30.glBindVertexArray(0);
 			return vao;
