@@ -108,9 +108,6 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 
 			for (int x = -1; x <= 1; x++) {
 				for (int z = -1; z <= 1; z++) {
-					if (x != 0 && z != 0) {
-						continue;
-					}
 					Chunk chunk = world.getChunk(chunkX + x, chunkZ + z);
 					this.chunks[(z + 1) * 3 + (x + 1)] = chunk;
 					for (int y = -1; y <= 1; y++) {
