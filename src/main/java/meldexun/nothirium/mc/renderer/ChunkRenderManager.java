@@ -4,23 +4,18 @@ import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.Nothirium;
-import meldexun.nothirium.mc.asm.NothiriumClassTransformer;
+import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL43;
-import meldexun.nothirium.mc.renderer.chunk.ChunkRendererOptifine;
-import meldexun.nothirium.mc.renderer.chunk.RenderChunk;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkDispatcher;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkProvider;
-import meldexun.nothirium.renderer.chunk.AbstractChunkRenderer;
-import meldexun.reflectionutil.ReflectionMethod;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 
 public class ChunkRenderManager {
 
-	private static final ReflectionMethod<Boolean> IS_SHADERS = new ReflectionMethod<>("Config", "isShaders", "isShaders");
-	private static AbstractChunkRenderer<RenderChunk> chunkRenderer;
-	private static RenderChunkProvider renderChunkProvider;
+	private static IChunkRenderer<?> chunkRenderer;
+	private static IRenderChunkProvider<?> renderChunkProvider;
 	private static IRenderChunkDispatcher taskDispatcher;
 
 	@SuppressWarnings("unchecked")
@@ -39,22 +34,14 @@ public class ChunkRenderManager {
 	}
 
 	public static void allChanged() {
-		if (chunkRenderer == null) {
-			if (NothiriumClassTransformer.OPTIFINE_DETECTED && IS_SHADERS.invoke(null)) {
-				chunkRenderer = new ChunkRendererOptifine();
-			} else if (Nothirium.isGL43Supported()) {
-				chunkRenderer = new ChunkRendererGL43(2);
-			} else {
-				chunkRenderer = new ChunkRendererGL20();
-			}
+		if (Optifine.OPTIFINE_DETECTED) {
+			chunkRenderer = Optifine.initChunkRenderer(chunkRenderer);
 		} else {
-			if (NothiriumClassTransformer.OPTIFINE_DETECTED && Nothirium.isGL43Supported()) {
-				if (!IS_SHADERS.invoke(null) && chunkRenderer instanceof ChunkRendererOptifine) {
-					chunkRenderer.dispose();
-					chunkRenderer = new ChunkRendererGL43(2);
-				} else if (IS_SHADERS.invoke(null) && !(chunkRenderer instanceof ChunkRendererOptifine)) {
-					chunkRenderer.dispose();
-					chunkRenderer = new ChunkRendererOptifine();
+			if (chunkRenderer == null) {
+				if (Nothirium.isGL43Supported()) {
+					chunkRenderer = new ChunkRendererGL43();
+				} else {
+					chunkRenderer = new ChunkRendererGL20();
 				}
 			}
 		}
@@ -88,10 +75,11 @@ public class ChunkRenderManager {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void setup() {
 		taskDispatcher.update();
 		renderChunkProvider.repositionCamera(RenderUtil.getCameraX(), RenderUtil.getCameraY(), RenderUtil.getCameraZ());
-		chunkRenderer.setup(renderChunkProvider, RenderUtil.getCameraX(), RenderUtil.getCameraY(), RenderUtil.getCameraZ(), RenderUtil.getFrustum(), RenderUtil.getFrame());
+		chunkRenderer.setup((IRenderChunkProvider) renderChunkProvider, RenderUtil.getCameraX(), RenderUtil.getCameraY(), RenderUtil.getCameraZ(), RenderUtil.getFrustum(), RenderUtil.getFrame());
 	}
 
 }

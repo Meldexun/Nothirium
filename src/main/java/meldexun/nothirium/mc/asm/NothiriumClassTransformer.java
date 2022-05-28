@@ -12,18 +12,6 @@ import net.minecraft.launchwrapper.IClassTransformer;
 
 public class NothiriumClassTransformer extends AbstractClassTransformer implements IClassTransformer {
 
-	public static final boolean OPTIFINE_DETECTED;
-	static {
-		boolean flag = false;
-		try {
-			Class.forName("optifine.OptiFineClassTransformer", false, NothiriumPlugin.class.getClassLoader());
-			flag = true;
-		} catch (ClassNotFoundException e) {
-			// ignore
-		}
-		OPTIFINE_DETECTED = flag;
-	}
-
 	@Override
 	protected void registerTransformers() {
 		// @formatter:off
