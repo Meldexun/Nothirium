@@ -96,6 +96,9 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 								visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
 						}
 
+						// I will just quote another mod here "This is a ridiculously hacky workaround, I would not recommend it to anyone."
+						blockState.getBlock().hasTileEntity(blockState);
+
 						for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
 							if (Nothirium.isBetterFoliageInstalled ? !BetterFoliage.canRenderBlockInLayer(blockState.getBlock(), blockState, layer) : !blockState.getBlock().canRenderInLayer(blockState, layer)) {
 								continue;
