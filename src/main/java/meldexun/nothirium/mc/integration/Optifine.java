@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.asm.NothiriumPlugin;
-import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL43;
 import meldexun.reflectionutil.ReflectionField;
 import meldexun.reflectionutil.ReflectionMethod;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -44,7 +43,7 @@ public class Optifine {
 		}
 		if (oldChunkRenderer == null) {
 			if (Nothirium.isGL43Supported() && !IS_SHADERS.invoke(null)) {
-				return new ChunkRendererGL43();
+				return new ChunkRendererGL43Optifine();
 			} else {
 				return new ChunkRendererGL20Optifine();
 			}
