@@ -15,10 +15,15 @@ varying vec2 v_LightCoord;
 varying float v_VertDistance;
 
 float fog_distance(vec3 pos, int shape) {
-    if (shape == 0) {
+    if (shape == 1) {
+        // cylindrical fog
+        return max(length(pos.xz), abs(pos.y));
+    } else if (shape == 2) {
+        // spherical fog
         return length(pos);
     } else {
-        return max(length(pos.xz), abs(pos.y));
+        // no fog
+        return -1.0;
     }
 }
 

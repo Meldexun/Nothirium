@@ -1,5 +1,6 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Objects;
 import java.util.function.ToIntFunction;
@@ -13,7 +14,6 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.GLSync;
-import org.lwjgl.util.vector.Vector4f;
 
 import meldexun.matrixutil.Matrix4f;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
@@ -42,7 +42,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	private static final String U_BLOCKTEX = "u_BlockTex";
 	private static final String U_LIGHTTEX = "u_LightTex";
 	private static final String U_MATRIX = "u_ModelViewProjectionMatrix";
-	private static final String U_FOGMODE = "u_FogMode";
+	private static final String U_FOGSHAPE = "u_FogShape";
 	private static final String U_FOGSTART = "u_FogStart";
 	private static final String U_FOGEND = "u_FogEnd";
 	private static final String U_FOGCOLOR = "u_FogColor";
@@ -66,6 +66,10 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	private final MultiObject<Enum2ObjMap<ChunkRenderPass, GLBuffer>> commandBuffers;
 
 	private final MultiObject<GLSync> syncs;
+
+	public ChunkRendererGL43() {
+		this(2);
+	}
 
 	public ChunkRendererGL43(int bufferCount) {
 		this.vaos = new MultiObject<>(bufferCount, i -> new Enum2IntMap<>(ChunkRenderPass.class));
@@ -111,18 +115,6 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 	@Override
 	public void setup(IRenderChunkProvider<RenderChunk> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
-		GLShader.push();
-		shader.use();
-		Matrix4f matrix = RenderUtil.getProjectionModelViewMatrix().copy();
-		matrix.translate((float) RenderUtil.getCameraOffsetX(), (float) RenderUtil.getCameraOffsetY(), (float) RenderUtil.getCameraOffsetZ());
-		GLUtil.setMatrix(shader.getUniform(U_MATRIX), matrix);
-		GL20.glUniform1f(shader.getUniform(U_FOGMODE), 1);
-		GL20.glUniform1f(shader.getUniform(U_FOGSTART), GL11.glGetFloat(GL11.GL_FOG_START));
-		GL20.glUniform1f(shader.getUniform(U_FOGEND), GL11.glGetFloat(GL11.GL_FOG_END));
-		Vector4f fogColor = GLUtil.getFloat4(GL11.GL_FOG_COLOR);
-		GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.x, fogColor.y, fogColor.z, fogColor.w);
-		GLShader.pop();
-
 		vaos.update();
 		offsetBuffers.update();
 		commandBuffers.update();
@@ -181,6 +173,14 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 		GLShader.push();
 		shader.use();
+		Matrix4f matrix = RenderUtil.getProjectionModelViewMatrix().copy();
+		matrix.translate((float) RenderUtil.getCameraOffsetX(), (float) RenderUtil.getCameraOffsetY(), (float) RenderUtil.getCameraOffsetZ());
+		GLUtil.setMatrix(shader.getUniform(U_MATRIX), matrix);
+		GL20.glUniform1i(shader.getUniform(U_FOGSHAPE), GL11.glGetInteger(GL11.GL_FOG));
+		GL20.glUniform1f(shader.getUniform(U_FOGSTART), GL11.glGetFloat(GL11.GL_FOG_START));
+		GL20.glUniform1f(shader.getUniform(U_FOGEND), GL11.glGetFloat(GL11.GL_FOG_END));
+		FloatBuffer fogColor = GLUtil.getFloat(GL11.GL_FOG_COLOR);
+		GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.get(0), fogColor.get(1), fogColor.get(2), fogColor.get(3));
 		GL30.glBindVertexArray(vaos.get().getInt(pass));
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, commandBuffers.get().get(pass).getBuffer());
 
