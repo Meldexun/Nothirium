@@ -11,6 +11,7 @@ import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
+import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunk;
 import meldexun.nothirium.util.Axis;
 import meldexun.nothirium.util.Direction;
@@ -22,7 +23,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -73,7 +74,7 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 		if (blockStorage == null || blockStorage.isEmpty()) {
 			return null;
 		}
-		return new RenderChunkTaskCompile(chunkRenderer, taskDispatcher, this, new ChunkCache(mc.world, this.getX() >> 4, this.getY() >> 4, this.getZ() >> 4));
+		return new RenderChunkTaskCompile(chunkRenderer, taskDispatcher, this, new ChunkCache(mc.world, this.getX() >> 4, this.getY() >> 4, this.getZ() >> 4, 1));
 	}
 
 	@Override
@@ -97,56 +98,89 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 		protected final int chunkX;
 		protected final int chunkY;
 		protected final int chunkZ;
-		protected final Chunk[] chunks = new Chunk[9];
-		protected final ExtendedBlockStorage[] blockStorages = new ExtendedBlockStorage[27];
+		protected final int radius;
+		protected final int gridSize;
+		protected final int minX;
+		protected final int maxX;
+		protected final int minY;
+		protected final int maxY;
+		protected final int minZ;
+		protected final int maxZ;
+		protected final Chunk[] chunks;
+		protected final ExtendedBlockStorage[] sections;
 
-		public ChunkCache(World world, int chunkX, int chunkY, int chunkZ) {
+		public ChunkCache(World world, int chunkX, int chunkY, int chunkZ, int radius) {
 			this.world = world;
 			this.chunkX = chunkX;
 			this.chunkY = chunkY;
 			this.chunkZ = chunkZ;
+			this.radius = radius;
+			this.gridSize = radius * 2 + 1;
+			this.minX = (chunkX - radius) << 4;
+			this.maxX = ((chunkX + radius) << 4) + 15;
+			this.minY = (chunkY - radius) << 4;
+			this.maxY = ((chunkY + radius) << 4) + 15;
+			this.minZ = (chunkZ - radius) << 4;
+			this.maxZ = ((chunkZ + radius) << 4) + 15;
+			this.chunks = new Chunk[gridSize * gridSize];
+			this.sections = new ExtendedBlockStorage[gridSize * gridSize * gridSize];
 
-			for (int x = -1; x <= 1; x++) {
-				for (int z = -1; z <= 1; z++) {
-					Chunk chunk = world.getChunk(chunkX + x, chunkZ + z);
-					this.chunks[(z + 1) * 3 + (x + 1)] = chunk;
-					for (int y = -1; y <= 1; y++) {
-						ExtendedBlockStorage blockStorage = chunkY + y >= 0 && chunkY + y < 16 ? chunk.getBlockStorageArray()[chunkY + y] : null;
-						this.blockStorages[((z + 1) * 3 + (y + 1)) * 3 + (x + 1)] = blockStorage;
+			for (int x = chunkX - radius; x <= chunkX + radius; x++) {
+				for (int z = chunkZ - radius; z <= chunkZ + radius; z++) {
+					Chunk chunk = world.getChunk(x, z);
+					this.chunks[chunkIndex(x, z)] = chunk;
+					for (int y = chunkY - radius; y <= chunkY + radius; y++) {
+						ExtendedBlockStorage blockStorage = y >= 0 && y < 16 ? chunk.getBlockStorageArray()[y] : null;
+						this.sections[sectionIndex(x, y, z)] = blockStorage;
 					}
 				}
 			}
 		}
 
-		private boolean withinBounds(int x, int y, int z) {
-			return (x >= -1 && x <= 1) && (y >= -1 && y <= 1) && (z >= -1 && z <= 1);
+		private int chunkIndex(BlockPos pos) {
+			return chunkIndex(pos.getX() >> 4, pos.getZ() >> 4);
+		}
+
+		private int chunkIndex(int chunkX, int chunkZ) {
+			return (chunkZ - this.chunkZ + radius) * gridSize + (chunkX - this.chunkX + radius);
+		}
+
+		private int sectionIndex(BlockPos pos) {
+			return sectionIndex(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+		}
+
+		private int sectionIndex(int chunkX, int chunkY, int chunkZ) {
+			return ((chunkZ - this.chunkZ + radius) * gridSize + (chunkY - this.chunkY + radius)) * gridSize + (chunkX - this.chunkX + radius);
+		}
+
+		private boolean withinBoundsXZ(BlockPos pos) {
+			return pos.getX() >= minX && pos.getX() <= maxX && pos.getZ() >= minZ && pos.getZ() <= maxZ;
+		}
+
+		private boolean withinBoundsY(BlockPos pos) {
+			return pos.getY() >= minY && pos.getY() <= maxY;
+		}
+
+		private boolean withinBoundsXYZ(BlockPos pos) {
+			return withinBoundsXZ(pos) && withinBoundsY(pos);
 		}
 
 		@Nullable
 		private Chunk getChunk(BlockPos pos) {
-			int x = (pos.getX() >> 4) - this.chunkX;
-			int y = (pos.getY() >> 4) - this.chunkY;
-			int z = (pos.getZ() >> 4) - this.chunkZ;
-			if (!withinBounds(x, y, z)) {
-				return null;
-			}
-			return this.chunks[(z + 1) * 3 + (x + 1)];
+			return this.chunks[chunkIndex(pos)];
 		}
 
 		@Nullable
 		private ExtendedBlockStorage getBlockStorage(BlockPos pos) {
-			int x = (pos.getX() >> 4) - this.chunkX;
-			int y = (pos.getY() >> 4) - this.chunkY;
-			int z = (pos.getZ() >> 4) - this.chunkZ;
-			if (!withinBounds(x, y, z)) {
-				return null;
-			}
-			return this.blockStorages[((z + 1) * 3 + (y + 1)) * 3 + (x + 1)];
+			return this.sections[sectionIndex(pos)];
 		}
 
 		@Override
 		@Nullable
 		public TileEntity getTileEntity(BlockPos pos) {
+			if (!withinBoundsXYZ(pos)) {
+				return null;
+			}
 			Chunk chunk = this.getChunk(pos);
 			if (chunk == null) {
 				return null;
@@ -155,22 +189,55 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 		}
 
 		@Override
-		public int getCombinedLight(BlockPos pos, int lightValue) {
-			Chunk chunk = this.getChunk(pos);
-			if (chunk == null) {
-				return this.world.provider.hasSkyLight() ? EnumSkyBlock.SKY.defaultLightValue << 20 : 0;
+		public int getCombinedLight(BlockPos pos, int minBlockLight) {
+			IBlockState state = this.getBlockState(pos);
+
+			if (state.useNeighborBrightness()) {
+				MutableBlockPos mutable = new MutableBlockPos();
+				int light = minBlockLight << 4;
+
+				for (EnumFacing facing : EnumFacingUtil.ALL) {
+					if (state.doesSideBlockRendering(this, pos, facing)) {
+						continue;
+					}
+					light = getSkyBlockLight(mutable.setPos(pos).move(facing), light);
+					if (light == (this.world.provider.hasSkyLight() ? 0xF0F0 : 0xF0)) {
+						break;
+					}
+				}
+
+				return light;
+			} else {
+				return getSkyBlockLight(pos, minBlockLight << 4);
 			}
-			ExtendedBlockStorage blockStorage = this.getBlockStorage(pos);
-			if (blockStorage == null) {
-				return this.world.provider.hasSkyLight() && chunk.canSeeSky(pos) ? EnumSkyBlock.SKY.defaultLightValue << 20 : 0;
+		}
+
+		public int getSkyBlockLight(BlockPos pos, int minCombinedLight) {
+			int sky = (minCombinedLight >> 20) & 15;
+			int block = (minCombinedLight >> 4) & 15;
+			ExtendedBlockStorage blockStorage;
+			Chunk chunk;
+
+			boolean withinBoundsXZ = withinBoundsXZ(pos);
+			if (withinBoundsXZ && withinBoundsY(pos) && (blockStorage = this.getBlockStorage(pos)) != null) {
+				if (this.world.provider.hasSkyLight() && sky < 15) {
+					sky = Math.max(blockStorage.getSkyLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15), sky);
+				}
+				if (block < 15) {
+					block = Math.max(blockStorage.getBlockLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15), block);
+				}
+			} else if (this.world.provider.hasSkyLight() && sky < 15 && (!withinBoundsXZ || (chunk = this.getChunk(pos)) == null || chunk.canSeeSky(pos))) {
+				sky = 15;
 			}
-			int skyLight = this.world.provider.hasSkyLight() ? blockStorage.getSkyLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15) : 0;
-			int blockLight = blockStorage.getBlockLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
-			return skyLight << 20 | blockLight << 4;
+
+			return sky << 20 | block << 4;
 		}
 
 		@Override
 		public IBlockState getBlockState(BlockPos pos) {
+			if (!withinBoundsXYZ(pos)) {
+				return Blocks.AIR.getDefaultState();
+			}
 			ExtendedBlockStorage blockStorage = this.getBlockStorage(pos);
 			if (blockStorage == null) {
 				return Blocks.AIR.getDefaultState();
@@ -186,6 +253,9 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 
 		@Override
 		public Biome getBiome(BlockPos pos) {
+			if (!withinBoundsXZ(pos)) {
+				return Biomes.PLAINS;
+			}
 			Chunk chunk = this.getChunk(pos);
 			if (chunk == null) {
 				return Biomes.PLAINS;
@@ -205,7 +275,7 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 
 		@Override
 		public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
-			if (!this.withinBounds((pos.getX() >> 4) - chunkX, (pos.getY() >> 4) - chunkY, (pos.getZ() >> 4) - chunkZ)) {
+			if (!this.withinBoundsXYZ(pos)) {
 				return _default;
 			}
 			return this.getBlockState(pos).isSideSolid(this, pos, side);
