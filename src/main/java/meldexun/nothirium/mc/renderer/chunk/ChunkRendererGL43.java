@@ -1,6 +1,5 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Objects;
 import java.util.function.ToIntFunction;
@@ -19,6 +18,7 @@ import meldexun.matrixutil.Matrix4f;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.Nothirium;
+import meldexun.nothirium.mc.util.FogUtil;
 import meldexun.nothirium.mc.util.ResourceSupplier;
 import meldexun.nothirium.util.collection.Enum2IntMap;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
@@ -42,19 +42,9 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	private static final String U_BLOCKTEX = "u_BlockTex";
 	private static final String U_LIGHTTEX = "u_LightTex";
 	private static final String U_MATRIX = "u_ModelViewProjectionMatrix";
-	private static final String U_FOGSHAPE = "u_FogShape";
-	private static final String U_FOGSTART = "u_FogStart";
-	private static final String U_FOGEND = "u_FogEnd";
-	private static final String U_FOGCOLOR = "u_FogColor";
-	private final GLShader shader = new GLShader.Builder()
-			.addShader(GL20.GL_VERTEX_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_vert.glsl")))
-			.addShader(GL20.GL_FRAGMENT_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_frag.glsl")))
-			.bindAttribute(A_POS, 0)
-			.bindAttribute(A_COLOR, 1)
-			.bindAttribute(A_TEXCOORD, 2)
-			.bindAttribute(A_LIGHTCOORD, 3)
-			.bindAttribute(A_OFFSET, 4)
-			.build(p -> {
+	private final GLShader shader = new GLShader.Builder().addShader(GL20.GL_VERTEX_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_vert.glsl")))
+			.addShader(GL20.GL_FRAGMENT_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_frag.glsl"))).bindAttribute(A_POS, 0).bindAttribute(A_COLOR, 1)
+			.bindAttribute(A_TEXCOORD, 2).bindAttribute(A_LIGHTCOORD, 3).bindAttribute(A_OFFSET, 4).build(p -> {
 				GL20.glUniform1i(p.getUniform(U_BLOCKTEX), 0);
 				GL20.glUniform1i(p.getUniform(U_LIGHTTEX), 1);
 			});
@@ -146,22 +136,15 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 			int baseInstance = chunkCounts.getInt(pass);
 			chunkCounts.set(pass, baseInstance + 1);
-			offsetBuffers.get().get(pass).getFloatBuffer()
-					.put(baseInstance * 3, (float) (renderChunk.getX() - cameraX))
-					.put(baseInstance * 3 + 1, (float) (renderChunk.getY() - cameraY))
+			offsetBuffers.get().get(pass).getFloatBuffer().put(baseInstance * 3, (float) (renderChunk.getX() - cameraX)).put(baseInstance * 3 + 1, (float) (renderChunk.getY() - cameraY))
 					.put(baseInstance * 3 + 2, (float) (renderChunk.getZ() - cameraZ));
 			if (pass != ChunkRenderPass.TRANSLUCENT) {
-				commandBuffers.get().get(pass).getIntBuffer()
-						.put(baseInstance * 4, renderChunk.getVBOPart(pass).getCount())
-						.put(baseInstance * 4 + 1, 1)
-						.put(baseInstance * 4 + 2, renderChunk.getVBOPart(pass).getFirst())
-						.put(baseInstance * 4 + 3, baseInstance);
+				commandBuffers.get().get(pass).getIntBuffer().put(baseInstance * 4, renderChunk.getVBOPart(pass).getCount()).put(baseInstance * 4 + 1, 1)
+						.put(baseInstance * 4 + 2, renderChunk.getVBOPart(pass).getFirst()).put(baseInstance * 4 + 3, baseInstance);
 			} else {
 				IntBuffer buffer = commandBuffers.get().get(pass).getIntBuffer();
-				buffer.put(buffer.capacity() - (baseInstance + 1) * 4, renderChunk.getVBOPart(pass).getCount())
-						.put(buffer.capacity() - (baseInstance + 1) * 4 + 1, 1)
-						.put(buffer.capacity() - (baseInstance + 1) * 4 + 2, renderChunk.getVBOPart(pass).getFirst())
-						.put(buffer.capacity() - (baseInstance + 1) * 4 + 3, baseInstance);
+				buffer.put(buffer.capacity() - (baseInstance + 1) * 4, renderChunk.getVBOPart(pass).getCount()).put(buffer.capacity() - (baseInstance + 1) * 4 + 1, 1)
+						.put(buffer.capacity() - (baseInstance + 1) * 4 + 2, renderChunk.getVBOPart(pass).getFirst()).put(buffer.capacity() - (baseInstance + 1) * 4 + 3, baseInstance);
 			}
 		}
 	}
@@ -176,11 +159,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		Matrix4f matrix = RenderUtil.getProjectionModelViewMatrix().copy();
 		matrix.translate((float) RenderUtil.getCameraOffsetX(), (float) RenderUtil.getCameraOffsetY(), (float) RenderUtil.getCameraOffsetZ());
 		GLUtil.setMatrix(shader.getUniform(U_MATRIX), matrix);
-		GL20.glUniform1i(shader.getUniform(U_FOGSHAPE), GL11.glGetInteger(GL11.GL_FOG));
-		GL20.glUniform1f(shader.getUniform(U_FOGSTART), GL11.glGetFloat(GL11.GL_FOG_START));
-		GL20.glUniform1f(shader.getUniform(U_FOGEND), GL11.glGetFloat(GL11.GL_FOG_END));
-		FloatBuffer fogColor = GLUtil.getFloat(GL11.GL_FOG_COLOR);
-		GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.get(0), fogColor.get(1), fogColor.get(2), fogColor.get(3));
+		FogUtil.setupFogFromGL(shader);
 		GL30.glBindVertexArray(vaos.get().getInt(pass));
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, commandBuffers.get().get(pass).getBuffer());
 

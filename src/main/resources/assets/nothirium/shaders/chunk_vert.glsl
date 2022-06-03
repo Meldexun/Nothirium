@@ -1,6 +1,8 @@
 #version 110
 
 uniform mat4 u_ModelViewProjectionMatrix;
+
+uniform bool u_FogEnabled;
 uniform int u_FogShape;
 
 attribute vec3 a_Pos;
@@ -14,17 +16,18 @@ varying vec2 v_TexCoord;
 varying vec2 v_LightCoord;
 varying float v_VertDistance;
 
-float fog_distance(vec3 pos, int shape) {
-    if (shape == 1) {
-        // cylindrical fog
-        return max(length(pos.xz), abs(pos.y));
-    } else if (shape == 2) {
-        // spherical fog
-        return length(pos);
-    } else {
-        // no fog
-        return -1.0;
+float fog_distance(vec3 pos) {
+    if (!u_FogEnabled) {
+        return 0.0;
     }
+
+    if (u_FogShape == 0) {
+        return max(length(pos.xz), abs(pos.y));
+    } else if (u_FogShape == 1) {
+        return length(pos);
+    }
+
+    return 0.0;
 }
 
 void main() {
@@ -33,5 +36,5 @@ void main() {
     v_Color = a_Color;
     v_TexCoord = a_TexCoord;
     v_LightCoord = vec2((a_LightCoord.x + 8.0) * 0.00390625, (a_LightCoord.y + 8.0) * 0.00390625);
-    v_VertDistance = fog_distance(pos, u_FogShape);
+    v_VertDistance = fog_distance(pos);
 }
