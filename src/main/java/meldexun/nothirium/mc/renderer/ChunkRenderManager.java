@@ -3,12 +3,12 @@ package meldexun.nothirium.mc.renderer;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
-import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL43;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkDispatcher;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkProvider;
+import meldexun.nothirium.opengl.GLHelper;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 
@@ -38,7 +38,7 @@ public class ChunkRenderManager {
 			chunkRenderer = Optifine.initChunkRenderer(chunkRenderer);
 		} else {
 			if (chunkRenderer == null) {
-				if (Nothirium.isGL43Supported()) {
+				if (GLHelper.isGL43Supported()) {
 					chunkRenderer = new ChunkRendererGL43();
 				} else {
 					chunkRenderer = new ChunkRendererGL20();

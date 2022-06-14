@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL45;
 
 import meldexun.reflectionutil.ReflectionField;
 import meldexun.reflectionutil.ReflectionMethod;
+import meldexun.renderlib.util.GLUtil;
 
 public class GLHelper {
 
@@ -16,25 +17,27 @@ public class GLHelper {
 	private static final ReflectionMethod<Void> NGL_GET_BUFFER_SUB_DATA = new ReflectionMethod<>(GL15.class, "nglGetBufferSubData", "nglGetBufferSubData", int.class, long.class, long.class, long.class, long.class);
 	private static final ReflectionMethod<Void> NGL_BUFFER_SUB_DATA = new ReflectionMethod<>(GL15.class, "nglBufferSubData", "nglBufferSubData", int.class, long.class, long.class, long.class, long.class);
 
-	private static ContextCapabilities caps;
 	private static long glGetBufferSubData;
 	private static long glBufferSubData;
 
-	public static void init(ContextCapabilities caps) {
-		GLHelper.caps = caps;
-		glGetBufferSubData = new ReflectionField<>(ContextCapabilities.class, "glGetBufferSubData", "glGetBufferSubData").getLong(caps);
-		glBufferSubData = new ReflectionField<>(ContextCapabilities.class, "glBufferSubData", "glBufferSubData").getLong(caps);
+	public static void init() {
+		glGetBufferSubData = new ReflectionField<>(ContextCapabilities.class, "glGetBufferSubData", "glGetBufferSubData").getLong(GLUtil.CAPS);
+		glBufferSubData = new ReflectionField<>(ContextCapabilities.class, "glBufferSubData", "glBufferSubData").getLong(GLUtil.CAPS);
+	}
+
+	public static boolean isGL43Supported() {
+		return GLUtil.CAPS.OpenGL43;
 	}
 
 	public static void growBuffer(int vbo, long oldSize, long newSize) {
-		if (caps.OpenGL45) {
+		if (GLUtil.CAPS.OpenGL45) {
 			int temp = GL45.glCreateBuffers();
 			GL45.glNamedBufferData(temp, oldSize, GL15.GL_STREAM_COPY);
 			GL45.glCopyNamedBufferSubData(vbo, temp, 0, 0, oldSize);
 			GL45.glNamedBufferData(vbo, newSize, GL15.GL_DYNAMIC_DRAW);
 			GL45.glCopyNamedBufferSubData(temp, vbo, 0, 0, oldSize);
 			GL15.glDeleteBuffers(temp);
-		} else if (caps.OpenGL31) {
+		} else if (GLUtil.CAPS.OpenGL31) {
 			int temp = GL15.glGenBuffers();
 			GL15.glBindBuffer(GL31.GL_COPY_READ_BUFFER, temp);
 			GL15.glBufferData(GL31.GL_COPY_READ_BUFFER, oldSize, GL15.GL_STREAM_COPY);
