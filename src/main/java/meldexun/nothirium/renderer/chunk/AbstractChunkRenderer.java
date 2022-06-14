@@ -20,13 +20,21 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 	private double lastTransparencyResortX;
 	private double lastTransparencyResortY;
 	private double lastTransparencyResortZ;
+	private int renderedChunks;
 
 	protected AbstractChunkRenderer() {
 
 	}
 
 	@Override
+	public int renderedChunks() {
+		return renderedChunks;
+	}
+
+	@Override
 	public void setup(IRenderChunkProvider<T> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
+		renderedChunks = 0;
+
 		int chunkX = MathUtil.floor(cameraX) >> 4;
 		int chunkY = MathUtil.floor(cameraY) >> 4;
 		int chunkZ = MathUtil.floor(cameraZ) >> 4;
@@ -62,6 +70,8 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 		while ((renderChunk = chunkQueue.poll()) != null) {
 			renderChunk.lastTimeRecorded = frame;
 			renderChunk.compileAsync(this, ChunkRenderManager.getTaskDispatcher());
+			if (!renderChunk.isEmpty())
+				renderedChunks++;
 			record(renderChunk, cameraX, cameraY, cameraZ);
 
 			for (Direction direction : Direction.ALL) {

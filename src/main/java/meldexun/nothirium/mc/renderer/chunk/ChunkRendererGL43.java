@@ -70,6 +70,11 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	}
 
 	@Override
+	public String name() {
+		return "Nothirium GL 4.3";
+	}
+
+	@Override
 	public void init(int renderDistance) {
 		int d = renderDistance * 2 + 1;
 		int renderDistance3 = d * d * d;

@@ -82,4 +82,13 @@ public class ChunkRenderManager {
 		chunkRenderer.setup((IRenderChunkProvider) renderChunkProvider, RenderUtil.getCameraX(), RenderUtil.getCameraY(), RenderUtil.getCameraZ(), RenderUtil.getFrustum(), RenderUtil.getFrame());
 	}
 
+	public static int renderedSections() {
+		return chunkRenderer.renderedChunks();
+	}
+
+	public static int totalSections() {
+		int r = Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 2 + 1;
+		return r * r * Math.min(r, 16);
+	}
+
 }

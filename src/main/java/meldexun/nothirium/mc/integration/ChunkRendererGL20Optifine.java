@@ -19,6 +19,11 @@ public class ChunkRendererGL20Optifine extends ChunkRendererGL20 {
 	private final Enum2ObjMap<ChunkRenderPass, List<RenderChunk>> shadow_chunks = new Enum2ObjMap<>(ChunkRenderPass.class, (Supplier<List<RenderChunk>>) ArrayList::new);
 
 	@Override
+	public String name() {
+		return "Nothirium GL 2.0 (Optifine)";
+	}
+
+	@Override
 	public void setup(IRenderChunkProvider<RenderChunk> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
 		// if (Optifine.IS_DYNAMIC_LIGHTS.invoke(null)) {
 		// Optifine.DYNAMIC_LIGHTS_UPDATE.invoke(null, Minecraft.getMinecraft().renderGlobal);

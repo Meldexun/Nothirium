@@ -11,6 +11,11 @@ import net.minecraft.client.renderer.GlStateManager;
 public class ChunkRendererGL43Optifine extends ChunkRendererGL43 {
 
 	@Override
+	public String name() {
+		return "Nothirium GL 4.3 (Optifine)";
+	}
+
+	@Override
 	public void setup(IRenderChunkProvider<RenderChunk> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
 		// if (Optifine.IS_DYNAMIC_LIGHTS.invoke(null)) {
 		// Optifine.DYNAMIC_LIGHTS_UPDATE.invoke(null, Minecraft.getMinecraft().renderGlobal);

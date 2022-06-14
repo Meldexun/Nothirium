@@ -10,6 +10,7 @@
     "MixinBlock",
     "MixinChunkProviderClient",
     "MixinEntityRenderer",
+    "MixinGuiOverlayDebug",
     "MixinRenderGlobal"
   ],
   "injectors": {

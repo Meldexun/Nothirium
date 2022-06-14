@@ -22,6 +22,11 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 	private final Enum2ObjMap<ChunkRenderPass, List<RenderChunk>> chunks = new Enum2ObjMap<>(ChunkRenderPass.class, (Supplier<List<RenderChunk>>) ArrayList::new);
 
 	@Override
+	public String name() {
+		return "Nothirium GL 2.0";
+	}
+
+	@Override
 	public void init(int renderDistance) {
 		// nothing to do
 	}

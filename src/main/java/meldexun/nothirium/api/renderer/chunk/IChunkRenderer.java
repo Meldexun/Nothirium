@@ -7,6 +7,10 @@ import meldexun.renderlib.util.Frustum;
 
 public interface IChunkRenderer<T extends IRenderChunk<T>> {
 
+	String name();
+
+	int renderedChunks();
+
 	void init(int renderDistance);
 
 	void setup(IRenderChunkProvider<T> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame);
