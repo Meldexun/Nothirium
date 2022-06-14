@@ -281,6 +281,10 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 			return this.getBlockState(pos).isSideSolid(this, pos, side);
 		}
 
+		public World getWorld() {
+			return this.world;
+		}
+
 	}
 
 }
