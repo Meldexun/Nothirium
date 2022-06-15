@@ -15,6 +15,7 @@ import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
 import meldexun.nothirium.util.Axis;
 import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VisibilitySet;
+import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
 
@@ -41,7 +42,7 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	private boolean dirty;
 	private IRenderChunkTask lastCompileTask;
 	private CompletableFuture<RenderChunkTaskResult> lastCompileTaskResult;
-	private final IVBOPart[] vboParts = new IVBOPart[ChunkRenderPass.values().length];
+	private final Enum2ObjMap<ChunkRenderPass, IVBOPart> vboParts = new Enum2ObjMap<>(ChunkRenderPass.class);
 	private int nonemptyVboParts;
 
 	protected AbstractRenderChunk(int x, int y, int z) {
@@ -187,15 +188,15 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	@Override
 	@Nullable
 	public IVBOPart getVBOPart(ChunkRenderPass pass) {
-		return this.vboParts[pass.ordinal()];
+		return this.vboParts.get(pass);
 	}
 
 	@Override
 	public void setVBOPart(ChunkRenderPass pass, @Nullable IVBOPart vboPart) {
-		if (this.vboParts[pass.ordinal()] != null) {
-			this.vboParts[pass.ordinal()].free();
+		if (this.vboParts.get(pass) != null) {
+			this.vboParts.get(pass).free();
 		}
-		this.vboParts[pass.ordinal()] = vboPart;
+		this.vboParts.set(pass, vboPart);
 		if (vboPart != null) {
 			nonemptyVboParts |= 1 << pass.ordinal();
 		} else {
