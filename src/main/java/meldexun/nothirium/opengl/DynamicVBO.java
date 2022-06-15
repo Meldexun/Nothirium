@@ -90,6 +90,16 @@ public class DynamicVBO {
 		}
 
 		@Override
+		public int getOffset() {
+			return this.vertexFirst * DynamicVBO.this.vertexSize;
+		}
+
+		@Override
+		public int getSize() {
+			return this.vertexCount * DynamicVBO.this.vertexSize;
+		}
+
+		@Override
 		public void free() {
 			if (this.valid) {
 				DynamicVBO.this.free(this.sector);

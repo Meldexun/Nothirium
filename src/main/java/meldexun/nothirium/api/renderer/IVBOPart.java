@@ -8,6 +8,10 @@ public interface IVBOPart {
 
 	int getCount();
 
+	int getOffset();
+
+	int getSize();
+
 	void free();
 
 	boolean isValid();

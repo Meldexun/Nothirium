@@ -17,7 +17,6 @@ import meldexun.nothirium.util.Axis;
 import meldexun.nothirium.util.Direction;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
@@ -84,10 +83,9 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 		if (vboPart == null) {
 			return null;
 		}
-		int vertexSize = DefaultVertexFormats.BLOCK.getSize();
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vboPart.getCount() * vertexSize).order(ByteOrder.nativeOrder());
+		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vboPart.getSize()).order(ByteOrder.nativeOrder());
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboPart.getVBO());
-		GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, vboPart.getFirst() * vertexSize, byteBuffer);
+		GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, vboPart.getOffset(), byteBuffer);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		return new RenderChunkTaskSortTranslucent(chunkRenderer, taskDispatcher, this, vboPart, byteBuffer);
 	}
