@@ -1,8 +1,6 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -10,16 +8,11 @@ import org.lwjgl.opengl.GL15;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
-import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
-import meldexun.nothirium.util.collection.Enum2ObjMap;
-import meldexun.renderlib.util.Frustum;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 
 public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
-
-	private final Enum2ObjMap<ChunkRenderPass, List<RenderChunk>> chunks = new Enum2ObjMap<>(ChunkRenderPass.class, (Supplier<List<RenderChunk>>) ArrayList::new);
 
 	@Override
 	public String name() {
@@ -29,34 +22,6 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 	@Override
 	public void init(int renderDistance) {
 		// nothing to do
-	}
-
-	@Override
-	public void setup(IRenderChunkProvider<RenderChunk> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
-		resetChunkLists();
-
-		super.setup(renderChunkProvider, cameraX, cameraY, cameraZ, frustum, frame);
-	}
-
-	protected void resetChunkLists() {
-		chunks.forEach(List::clear);
-	}
-
-	@Override
-	protected void record(RenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
-		if (renderChunk.isEmpty())
-			return;
-
-		for (ChunkRenderPass pass : ChunkRenderPass.ALL) {
-			if (renderChunk.getVBOPart(pass) == null)
-				continue;
-
-			getChunkListFor(pass).add(renderChunk);
-		}
-	}
-
-	protected List<RenderChunk> getChunkListFor(ChunkRenderPass pass) {
-		return chunks.get(pass);
 	}
 
 	@Override
@@ -70,7 +35,7 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 
 		setupAttributePointers(pass);
 
-		List<RenderChunk> list = getChunkListFor(pass);
+		List<RenderChunk> list = chunks.get(pass);
 		if (pass != ChunkRenderPass.TRANSLUCENT) {
 			for (int i = 0; i < list.size(); i++) {
 				RenderChunk renderChunk = list.get(i);

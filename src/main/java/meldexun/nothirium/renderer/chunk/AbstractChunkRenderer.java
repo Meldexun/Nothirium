@@ -1,14 +1,19 @@
 package meldexun.nothirium.renderer.chunk;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
+import java.util.function.Supplier;
 
 import org.lwjgl.opengl.GL11;
 
+import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.renderer.ChunkRenderManager;
 import meldexun.nothirium.util.Direction;
+import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
 import net.minecraft.client.Minecraft;
@@ -20,7 +25,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 	private double lastTransparencyResortX;
 	private double lastTransparencyResortY;
 	private double lastTransparencyResortZ;
-	private int renderedChunks;
+	protected final Enum2ObjMap<ChunkRenderPass, List<T>> chunks = new Enum2ObjMap<>(ChunkRenderPass.class, (Supplier<List<T>>) ArrayList::new);
 
 	protected AbstractChunkRenderer() {
 
@@ -28,13 +33,11 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 
 	@Override
 	public int renderedChunks() {
-		return renderedChunks;
+		return chunks.stream().mapToInt(List::size).max().getAsInt();
 	}
 
 	@Override
 	public void setup(IRenderChunkProvider<T> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
-		renderedChunks = 0;
-
 		int chunkX = MathUtil.floor(cameraX) >> 4;
 		int chunkY = MathUtil.floor(cameraY) >> 4;
 		int chunkZ = MathUtil.floor(cameraZ) >> 4;
@@ -60,6 +63,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 			}
 		}
 
+		chunks.forEach(List::clear);
 		T rootRenderChunk = renderChunkProvider.getRenderChunkAt(chunkX, chunkY, chunkZ);
 		rootRenderChunk.visibleDirections = 0x3F;
 		chunkQueue.add(rootRenderChunk);
@@ -70,9 +74,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 		while ((renderChunk = chunkQueue.poll()) != null) {
 			renderChunk.lastTimeRecorded = frame;
 			renderChunk.compileAsync(this, ChunkRenderManager.getTaskDispatcher());
-			if (!renderChunk.isEmpty())
-				renderedChunks++;
-			record(renderChunk, cameraX, cameraY, cameraZ);
+			addToRenderLists(renderChunk);
 
 			for (Direction direction : Direction.ALL) {
 				T neighbor = renderChunk.getNeighbor(direction);
@@ -98,6 +100,15 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 		}
 	}
 
-	protected abstract void record(T renderChunk, double cameraX, double cameraY, double cameraZ);
+	private void addToRenderLists(T renderChunk) {
+		if (renderChunk.isEmpty()) {
+			return;
+		}
+		chunks.forEach((pass, list) -> {
+			if (renderChunk.getVBOPart(pass) != null) {
+				list.add(renderChunk);
+			}
+		});
+	}
 
 }

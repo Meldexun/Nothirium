@@ -1,6 +1,5 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.nio.IntBuffer;
 import java.util.Objects;
 import java.util.function.ToIntFunction;
 
@@ -51,7 +50,6 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 	private final MultiObject<Enum2IntMap<ChunkRenderPass>> vaos;
 
-	private final Enum2IntMap<ChunkRenderPass> chunkCounts;
 	private final MultiObject<Enum2ObjMap<ChunkRenderPass, GLBuffer>> offsetBuffers;
 	private final MultiObject<Enum2ObjMap<ChunkRenderPass, GLBuffer>> commandBuffers;
 
@@ -63,7 +61,6 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 	public ChunkRendererGL43(int bufferCount) {
 		this.vaos = new MultiObject<>(bufferCount, i -> new Enum2IntMap<>(ChunkRenderPass.class));
-		this.chunkCounts = new Enum2IntMap<>(ChunkRenderPass.class);
 		this.offsetBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
 		this.commandBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
 		this.syncs = new MultiObject<>(bufferCount);
@@ -110,11 +107,12 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 	@Override
 	public void setup(IRenderChunkProvider<RenderChunk> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
+		super.setup(renderChunkProvider, cameraX, cameraY, cameraZ, frustum, frame);
+
 		vaos.update();
 		offsetBuffers.update();
 		commandBuffers.update();
 		syncs.update();
-		chunkCounts.fill((ToIntFunction<ChunkRenderPass>) pass -> 0);
 		offsetBuffers.get().forEach(b -> b.map(GL30.GL_MAP_WRITE_BIT, GL15.GL_WRITE_ONLY));
 		commandBuffers.get().forEach(b -> b.map(GL30.GL_MAP_WRITE_BIT, GL15.GL_WRITE_ONLY));
 
@@ -124,34 +122,32 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 			syncs.set(null);
 		}
 
-		super.setup(renderChunkProvider, cameraX, cameraY, cameraZ, frustum, frame);
+		this.chunks.forEach((pass, list) -> {
+			if (pass != ChunkRenderPass.TRANSLUCENT) {
+				for (int i = 0; i < list.size(); i++) {
+					this.record(list.get(i), pass, i, cameraX, cameraY, cameraZ);
+				}
+			} else {
+				for (int i = list.size() - 1; i >= 0; i--) {
+					this.record(list.get(i), pass, i, cameraX, cameraY, cameraZ);
+				}
+			}
+		});
 
 		offsetBuffers.get().forEach(GLBuffer::unmap);
 		commandBuffers.get().forEach(GLBuffer::unmap);
 	}
 
-	@Override
-	protected void record(RenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
-		if (renderChunk.isEmpty())
-			return;
-
-		for (ChunkRenderPass pass : ChunkRenderPass.ALL) {
-			if (renderChunk.getVBOPart(pass) == null)
-				continue;
-
-			int baseInstance = chunkCounts.getInt(pass);
-			chunkCounts.set(pass, baseInstance + 1);
-			offsetBuffers.get().get(pass).getFloatBuffer().put(baseInstance * 3, (float) (renderChunk.getX() - cameraX)).put(baseInstance * 3 + 1, (float) (renderChunk.getY() - cameraY))
-					.put(baseInstance * 3 + 2, (float) (renderChunk.getZ() - cameraZ));
-			if (pass != ChunkRenderPass.TRANSLUCENT) {
-				commandBuffers.get().get(pass).getIntBuffer().put(baseInstance * 4, renderChunk.getVBOPart(pass).getCount()).put(baseInstance * 4 + 1, 1)
-						.put(baseInstance * 4 + 2, renderChunk.getVBOPart(pass).getFirst()).put(baseInstance * 4 + 3, baseInstance);
-			} else {
-				IntBuffer buffer = commandBuffers.get().get(pass).getIntBuffer();
-				buffer.put(buffer.capacity() - (baseInstance + 1) * 4, renderChunk.getVBOPart(pass).getCount()).put(buffer.capacity() - (baseInstance + 1) * 4 + 1, 1)
-						.put(buffer.capacity() - (baseInstance + 1) * 4 + 2, renderChunk.getVBOPart(pass).getFirst()).put(buffer.capacity() - (baseInstance + 1) * 4 + 3, baseInstance);
-			}
-		}
+	protected void record(RenderChunk renderChunk, ChunkRenderPass pass, int index, double cameraX, double cameraY, double cameraZ) {
+		offsetBuffers.get().get(pass).getFloatBuffer()
+				.put(index * 3, (float) (renderChunk.getX() - cameraX))
+				.put(index * 3 + 1, (float) (renderChunk.getY() - cameraY))
+				.put(index * 3 + 2, (float) (renderChunk.getZ() - cameraZ));
+		commandBuffers.get().get(pass).getIntBuffer()
+				.put(index * 4, renderChunk.getVBOPart(pass).getCount())
+				.put(index * 4 + 1, 1)
+				.put(index * 4 + 2, renderChunk.getVBOPart(pass).getFirst())
+				.put(index * 4 + 3, index);
 	}
 
 	@Override
@@ -168,11 +164,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		GL30.glBindVertexArray(vaos.get().getInt(pass));
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, commandBuffers.get().get(pass).getBuffer());
 
-		long indirectBufferOffset = 0;
-		if (pass == ChunkRenderPass.TRANSLUCENT) {
-			indirectBufferOffset = commandBuffers.get().get(pass).getSize() - chunkCounts.getInt(pass) * 16;
-		}
-		GL43.glMultiDrawArraysIndirect(GL11.GL_QUADS, indirectBufferOffset, chunkCounts.getInt(pass), 0);
+		GL43.glMultiDrawArraysIndirect(GL11.GL_QUADS, 0, chunks.get(pass).size(), 0);
 		if (pass == ChunkRenderPass.TRANSLUCENT) {
 			if (syncs.get() != null)
 				GL32.glDeleteSync(syncs.get());

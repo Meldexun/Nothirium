@@ -1,22 +1,15 @@
 package meldexun.nothirium.mc.integration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
-
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunk;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
-import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.renderlib.util.Frustum;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
 public class ChunkRendererGL20Optifine extends ChunkRendererGL20 {
-
-	private final Enum2ObjMap<ChunkRenderPass, List<RenderChunk>> shadow_chunks = new Enum2ObjMap<>(ChunkRenderPass.class, (Supplier<List<RenderChunk>>) ArrayList::new);
 
 	@Override
 	public String name() {
@@ -30,24 +23,6 @@ public class ChunkRendererGL20Optifine extends ChunkRendererGL20 {
 		// }
 
 		super.setup(renderChunkProvider, cameraX, cameraY, cameraZ, frustum, Optifine.IS_SHADOW_PASS.getBoolean(null) ? -frame : frame);
-	}
-
-	@Override
-	protected void resetChunkLists() {
-		if (Optifine.IS_SHADOW_PASS.getBoolean(null)) {
-			shadow_chunks.forEach(List::clear);
-		} else {
-			super.resetChunkLists();
-		}
-	}
-
-	@Override
-	protected List<RenderChunk> getChunkListFor(ChunkRenderPass pass) {
-		if (Optifine.IS_SHADOW_PASS.getBoolean(null)) {
-			return shadow_chunks.get(pass);
-		}
-
-		return super.getChunkListFor(pass);
 	}
 
 	@Override
