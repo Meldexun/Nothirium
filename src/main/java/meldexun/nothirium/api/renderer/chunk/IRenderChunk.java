@@ -13,7 +13,7 @@ public interface IRenderChunk<N extends IRenderChunk<N>> {
 
 	int getZ();
 
-	void setCoords(int x, int y, int z);
+	boolean setCoords(int x, int y, int z);
 
 	@Nullable
 	N getNeighbor(Direction direction);

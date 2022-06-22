@@ -68,13 +68,15 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	}
 
 	@Override
-	public void setCoords(int x, int y, int z) {
+	public boolean setCoords(int x, int y, int z) {
 		if (this.x != x || this.y != y || this.z != z) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
 			this.releaseBuffers();
+			return true;
 		}
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
