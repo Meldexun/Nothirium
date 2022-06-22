@@ -30,34 +30,24 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 		Minecraft.getMinecraft().entityRenderer.enableLightmap();
 
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbos.get(pass).getVbo());
-
 		setupClientState(pass);
-
 		setupAttributePointers(pass);
 
 		List<RenderChunk> list = chunks.get(pass);
+		double cameraX = RenderUtil.getCameraEntityX();
+		double cameraY = RenderUtil.getCameraEntityY();
+		double cameraZ = RenderUtil.getCameraEntityZ();
 		if (pass != ChunkRenderPass.TRANSLUCENT) {
 			for (int i = 0; i < list.size(); i++) {
-				RenderChunk renderChunk = list.get(i);
-				IVBOPart vboPart = renderChunk.getVBOPart(pass);
-				GL11.glPushMatrix();
-				GL11.glTranslated(renderChunk.getX() - RenderUtil.getCameraEntityX(), renderChunk.getY() - RenderUtil.getCameraEntityY(), renderChunk.getZ() - RenderUtil.getCameraEntityZ());
-				GL11.glDrawArrays(GL11.GL_QUADS, vboPart.getFirst(), vboPart.getCount());
-				GL11.glPopMatrix();
+				this.draw(list.get(i), pass, cameraX, cameraY, cameraZ);
 			}
 		} else {
 			for (int i = list.size() - 1; i >= 0; i--) {
-				RenderChunk renderChunk = list.get(i);
-				IVBOPart vboPart = renderChunk.getVBOPart(pass);
-				GL11.glPushMatrix();
-				GL11.glTranslated(renderChunk.getX() - RenderUtil.getCameraEntityX(), renderChunk.getY() - RenderUtil.getCameraEntityY(), renderChunk.getZ() - RenderUtil.getCameraEntityZ());
-				GL11.glDrawArrays(GL11.GL_QUADS, vboPart.getFirst(), vboPart.getCount());
-				GL11.glPopMatrix();
+				this.draw(list.get(i), pass, cameraX, cameraY, cameraZ);
 			}
 		}
 
 		resetClientState(pass);
-
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
 		Minecraft.getMinecraft().entityRenderer.disableLightmap();
@@ -79,6 +69,14 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 		GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
 		GL11.glTexCoordPointer(2, GL11.GL_SHORT, 28, 24);
 		GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+	}
+
+	protected void draw(RenderChunk renderChunk, ChunkRenderPass pass, double cameraX, double cameraY, double cameraZ) {
+		IVBOPart vboPart = renderChunk.getVBOPart(pass);
+		GL11.glPushMatrix();
+		GL11.glTranslated(renderChunk.getX() - cameraX, renderChunk.getY() - cameraY, renderChunk.getZ() - cameraZ);
+		GL11.glDrawArrays(GL11.GL_QUADS, vboPart.getFirst(), vboPart.getCount());
+		GL11.glPopMatrix();
 	}
 
 	protected void resetClientState(ChunkRenderPass pass) {
