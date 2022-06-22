@@ -1,5 +1,6 @@
 package meldexun.nothirium.mc.renderer;
 
+import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
@@ -82,8 +83,8 @@ public class ChunkRenderManager {
 		chunkRenderer.setup((IRenderChunkProvider) renderChunkProvider, RenderUtil.getCameraX(), RenderUtil.getCameraY(), RenderUtil.getCameraZ(), RenderUtil.getFrustum(), RenderUtil.getFrame());
 	}
 
-	public static int renderedSections() {
-		return chunkRenderer.renderedChunks();
+	public static int renderedSections(ChunkRenderPass pass) {
+		return chunkRenderer.renderedChunks(pass);
 	}
 
 	public static int totalSections() {

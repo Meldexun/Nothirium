@@ -9,7 +9,7 @@ public interface IChunkRenderer<T extends IRenderChunk<T>> {
 
 	String name();
 
-	int renderedChunks();
+	int renderedChunks(ChunkRenderPass pass);
 
 	void init(int renderDistance);
 
