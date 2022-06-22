@@ -45,9 +45,10 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
     implementation "org.spongepowered:mixin:${mixin_version}"
+    atDependencies fg.deobf('curse.maven:ChunkAnimator-236484:2432424')
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 
-    atDependencies fg.deobf('meldexun:RenderLib:1.12.2-1.0.7@jar')
+    atDependencies fg.deobf('meldexun:RenderLib:1.12.2-1.0.8@jar')
 }
 
 minecraft {
