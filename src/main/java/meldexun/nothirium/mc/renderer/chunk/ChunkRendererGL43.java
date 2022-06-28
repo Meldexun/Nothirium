@@ -12,11 +12,13 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.GLSync;
+import org.lwjgl.util.vector.Vector3f;
 
 import meldexun.matrixutil.Matrix4f;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.Nothirium;
+import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.mc.util.FogUtil;
 import meldexun.nothirium.mc.util.ResourceSupplier;
 import meldexun.nothirium.util.collection.Enum2IntMap;
@@ -139,6 +141,12 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	}
 
 	protected void record(RenderChunk renderChunk, ChunkRenderPass pass, int index, double cameraX, double cameraY, double cameraZ) {
+		if (Nothirium.isChunkAnimatorInstalled) {
+			Vector3f offset = ChunkAnimator.getOffset(renderChunk);
+			cameraX -= offset.x;
+			cameraY -= offset.y;
+			cameraZ -= offset.z;
+		}
 		offsetBuffers.get().get(pass).getFloatBuffer()
 				.put(index * 3, (float) (renderChunk.getX() - cameraX))
 				.put(index * 3 + 1, (float) (renderChunk.getY() - cameraY))

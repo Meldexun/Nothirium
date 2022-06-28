@@ -11,6 +11,8 @@ import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
+import meldexun.nothirium.mc.Nothirium;
+import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunk;
 import meldexun.nothirium.util.Axis;
@@ -35,6 +37,15 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 
 	public RenderChunk(int x, int y, int z) {
 		super(x, y, z);
+	}
+
+	@Override
+	public boolean setCoords(int x, int y, int z) {
+		boolean coordsUpdated = super.setCoords(x, y, z);
+		if (coordsUpdated && Nothirium.isChunkAnimatorInstalled) {
+			ChunkAnimator.onSetCoords(this);
+		}
+		return coordsUpdated;
 	}
 
 	@Override
