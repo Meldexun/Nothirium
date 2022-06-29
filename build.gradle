@@ -47,7 +47,7 @@ dependencies {
     implementation "org.spongepowered:mixin:${mixin_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 
-    atDependencies fg.deobf('meldexun:RenderLib:1.12.2-1.0.8@jar')
+    atDependencies fg.deobf('meldexun:RenderLib:1.12.2-1.1.0@jar')
 
     buildDependencies fg.deobf('curse.maven:ChunkAnimator-236484:3850023')
 }
