@@ -130,8 +130,8 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 					this.record(list.get(i), pass, i, cameraX, cameraY, cameraZ);
 				}
 			} else {
-				for (int i = list.size() - 1; i >= 0; i--) {
-					this.record(list.get(i), pass, i, cameraX, cameraY, cameraZ);
+				for (int i = 0; i < list.size(); i++) {
+					this.record(list.get(list.size() - 1 - i), pass, i, cameraX, cameraY, cameraZ);
 				}
 			}
 		});

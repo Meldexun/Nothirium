@@ -45,8 +45,8 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 				this.draw(list.get(i), pass, cameraX, cameraY, cameraZ);
 			}
 		} else {
-			for (int i = list.size() - 1; i >= 0; i--) {
-				this.draw(list.get(i), pass, cameraX, cameraY, cameraZ);
+			for (int i = 0; i < list.size(); i++) {
+				this.draw(list.get(list.size() - 1 - i), pass, cameraX, cameraY, cameraZ);
 			}
 		}
 
