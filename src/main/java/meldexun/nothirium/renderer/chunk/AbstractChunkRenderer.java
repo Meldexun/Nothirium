@@ -99,6 +99,8 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 				for (int y = -r; y <= r; y++) {
 					for (int z = -r; z <= r; z++) {
 						T renderChunk = provider.getRenderChunkAt(chunkX + x, chunkY + y, chunkZ + z);
+						if (renderChunk == null)
+							continue;
 						if (renderChunk.isFrustumCulled(frustum))
 							continue;
 						renderChunk.resortTransparency(this, taskDispatcher);
