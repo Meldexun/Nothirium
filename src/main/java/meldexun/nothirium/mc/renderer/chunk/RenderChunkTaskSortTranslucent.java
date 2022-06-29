@@ -43,28 +43,28 @@ public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<Rend
 		if (entity == null)
 			return RenderChunkTaskResult.CANCELLED;
 
-		double tx = entity.posX - renderChunk.getX();
-		double ty = (entity.posY + entity.getEyeHeight()) - renderChunk.getY();
-		double tz = entity.posZ - renderChunk.getZ();
+		float tx = (float) entity.posX - renderChunk.getX();
+		float ty = (float) ((entity.posY + entity.getEyeHeight()) - renderChunk.getY());
+		float tz = (float) entity.posZ - renderChunk.getZ();
 		int quadCount = vboPart.getCount() / 4;
 		int vertexSize = DefaultVertexFormats.BLOCK.getSize();
 
 		double[] quadDistToCam = IntStream.range(0, quadCount).mapToDouble(quad -> {
-			double x0 = byteBuffer.getFloat((quad * 4) * vertexSize);
-			double y0 = byteBuffer.getFloat((quad * 4) * vertexSize + 4);
-			double z0 = byteBuffer.getFloat((quad * 4) * vertexSize + 8);
-			double x1 = byteBuffer.getFloat((quad * 4 + 1) * vertexSize);
-			double y1 = byteBuffer.getFloat((quad * 4 + 1) * vertexSize + 4);
-			double z1 = byteBuffer.getFloat((quad * 4 + 1) * vertexSize + 8);
-			double x2 = byteBuffer.getFloat((quad * 4 + 2) * vertexSize);
-			double y2 = byteBuffer.getFloat((quad * 4 + 2) * vertexSize + 4);
-			double z2 = byteBuffer.getFloat((quad * 4 + 2) * vertexSize + 8);
-			double x3 = byteBuffer.getFloat((quad * 4 + 3) * vertexSize);
-			double y3 = byteBuffer.getFloat((quad * 4 + 3) * vertexSize + 4);
-			double z3 = byteBuffer.getFloat((quad * 4 + 3) * vertexSize + 8);
-			double x = (x0 + x1 + x2 + x3) * 0.25D - tx;
-			double y = (y0 + y1 + y2 + y3) * 0.25D - ty;
-			double z = (z0 + z1 + z2 + z3) * 0.25D - tz;
+			float x0 = byteBuffer.getFloat((quad * 4) * vertexSize);
+			float y0 = byteBuffer.getFloat((quad * 4) * vertexSize + 4);
+			float z0 = byteBuffer.getFloat((quad * 4) * vertexSize + 8);
+			float x1 = byteBuffer.getFloat((quad * 4 + 1) * vertexSize);
+			float y1 = byteBuffer.getFloat((quad * 4 + 1) * vertexSize + 4);
+			float z1 = byteBuffer.getFloat((quad * 4 + 1) * vertexSize + 8);
+			float x2 = byteBuffer.getFloat((quad * 4 + 2) * vertexSize);
+			float y2 = byteBuffer.getFloat((quad * 4 + 2) * vertexSize + 4);
+			float z2 = byteBuffer.getFloat((quad * 4 + 2) * vertexSize + 8);
+			float x3 = byteBuffer.getFloat((quad * 4 + 3) * vertexSize);
+			float y3 = byteBuffer.getFloat((quad * 4 + 3) * vertexSize + 4);
+			float z3 = byteBuffer.getFloat((quad * 4 + 3) * vertexSize + 8);
+			double x = (x0 + x1 + x2 + x3) * 0.25F - tx;
+			double y = (y0 + y1 + y2 + y3) * 0.25F - ty;
+			double z = (z0 + z1 + z2 + z3) * 0.25F - tz;
 			return x * x + y * y + z * z;
 		}).toArray();
 
@@ -90,23 +90,23 @@ public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<Rend
 			int index = quadIndices[i].intValue();
 
 			if (index != i) {
-				intBuffer.limit(index * vertexSize + vertexSize);
+				intBuffer.limit((index + 1) * vertexSize);
 				intBuffer.position(index * vertexSize);
 				intBuffer.get(temp);
 				int j = index;
 
 				for (int k = quadIndices[index].intValue(); j != i; k = quadIndices[k].intValue()) {
-					intBuffer.limit(k * vertexSize + vertexSize);
+					intBuffer.limit((k + 1) * vertexSize);
 					intBuffer.position(k * vertexSize);
 					IntBuffer intbuffer = intBuffer.slice();
-					intBuffer.limit(j * vertexSize + vertexSize);
+					intBuffer.limit((j + 1) * vertexSize);
 					intBuffer.position(j * vertexSize);
 					intBuffer.put(intbuffer);
 					bitset.set(j);
 					j = k;
 				}
 
-				intBuffer.limit(i * vertexSize + vertexSize);
+				intBuffer.limit((i + 1) * vertexSize);
 				intBuffer.position(i * vertexSize);
 				intBuffer.put(temp);
 			}
