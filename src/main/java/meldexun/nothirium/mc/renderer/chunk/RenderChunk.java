@@ -1,11 +1,6 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import javax.annotation.Nullable;
-
-import org.lwjgl.opengl.GL15;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
@@ -94,11 +89,7 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 		if (vboPart == null) {
 			return null;
 		}
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vboPart.getSize()).order(ByteOrder.nativeOrder());
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboPart.getVBO());
-		GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, vboPart.getOffset(), byteBuffer);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		return new RenderChunkTaskSortTranslucent(chunkRenderer, taskDispatcher, this, vboPart, byteBuffer);
+		return new RenderChunkTaskSortTranslucent(chunkRenderer, taskDispatcher, this, vboPart, this.getTranslucentVertexData());
 	}
 
 	public static class ChunkCache implements IBlockAccess {

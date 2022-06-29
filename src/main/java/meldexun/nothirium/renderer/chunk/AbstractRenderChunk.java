@@ -1,5 +1,6 @@
 package meldexun.nothirium.renderer.chunk;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
@@ -43,6 +44,7 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	private IRenderChunkTask lastCompileTask;
 	private CompletableFuture<RenderChunkTaskResult> lastCompileTaskResult;
 	private final Enum2ObjMap<ChunkRenderPass, IVBOPart> vboParts = new Enum2ObjMap<>(ChunkRenderPass.class);
+	private ByteBuffer translucentVertexData;
 	private int nonemptyVboParts;
 
 	protected AbstractRenderChunk(int x, int y, int z) {
@@ -204,6 +206,9 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 		} else {
 			nonemptyVboParts &= ~(1 << pass.ordinal());
 		}
+		if (pass == ChunkRenderPass.TRANSLUCENT) {
+			this.translucentVertexData = null;
+		}
 	}
 
 	@Override
@@ -260,5 +265,14 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 
 	@Nullable
 	protected abstract AbstractRenderChunkTask<?> createSortTranslucentTask(IChunkRenderer<?> chunkRenderer, IRenderChunkDispatcher taskDispatcher);
+
+	@Nullable
+	public ByteBuffer getTranslucentVertexData() {
+		return translucentVertexData;
+	}
+
+	public void setTranslucentVertexData(@Nullable ByteBuffer translucentVertexData) {
+		this.translucentVertexData = translucentVertexData;
+	}
 
 }

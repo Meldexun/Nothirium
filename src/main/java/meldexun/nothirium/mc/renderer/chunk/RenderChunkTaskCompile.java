@@ -16,6 +16,7 @@ import meldexun.nothirium.mc.integration.BetterFoliage;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
 import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
+import meldexun.nothirium.util.BufferUtil;
 import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VisibilityGraph;
 import meldexun.nothirium.util.VisibilitySet;
@@ -171,6 +172,9 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 								this.renderChunk.setVBOPart(pass, null);
 							} else {
 								this.renderChunk.setVBOPart(pass, this.chunkRenderer.buffer(pass, bufferBuilder.getByteBuffer()));
+								if (pass == ChunkRenderPass.TRANSLUCENT) {
+									this.renderChunk.setTranslucentVertexData(BufferUtil.copy(bufferBuilder.getByteBuffer()));
+								}
 							}
 						}
 					}
