@@ -212,7 +212,7 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 						continue;
 					}
 					light = getSkyBlockLight(mutable.setPos(pos).move(facing), light);
-					if (light == (this.world.provider.hasSkyLight() ? 0xF0F0 : 0xF0)) {
+					if (light == (this.world.provider.hasSkyLight() ? 0xF000F0 : 0xF0)) {
 						break;
 					}
 				}
