@@ -49,6 +49,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 		chunkQueue.add(rootRenderChunk);
 
 		double fogEnd = GL11.glGetFloat(GL11.GL_FOG_END);
+		boolean spectator = isSpectator();
 
 		T renderChunk;
 		while ((renderChunk = chunkQueue.poll()) != null) {
@@ -64,7 +65,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 					continue;
 				if (neighbor.isFaceCulled(cameraX, cameraY, cameraZ, direction.opposite()))
 					continue;
-				if (!renderChunk.isVisibleFromAnyOrigin(direction))
+				if (!spectator && !renderChunk.isVisibleFromAnyOrigin(direction))
 					continue;
 				if (neighbor.lastTimeEnqueued != frame) {
 					neighbor.lastTimeEnqueued = frame;
@@ -120,5 +121,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 			}
 		});
 	}
+
+	protected abstract boolean isSpectator();
 
 }

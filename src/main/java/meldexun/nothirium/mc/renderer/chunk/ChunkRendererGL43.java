@@ -31,6 +31,8 @@ import meldexun.renderlib.util.GLUtil;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
@@ -194,6 +196,13 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		commandBuffers.stream().flatMap(Enum2ObjMap::stream).filter(Objects::nonNull).forEach(GLBuffer::dispose);
 		vaos.stream().flatMapToInt(Enum2IntMap::streamInt).forEach(GL30::glDeleteVertexArrays);
 		syncs.stream().filter(Objects::nonNull).forEach(GL32::glDeleteSync);
+	}
+
+	@Override
+	protected boolean isSpectator() {
+		Minecraft mc = Minecraft.getMinecraft();
+		Entity cameraEntity = mc.getRenderViewEntity();
+		return cameraEntity instanceof EntityPlayer && ((EntityPlayer) cameraEntity).isSpectator();
 	}
 
 }

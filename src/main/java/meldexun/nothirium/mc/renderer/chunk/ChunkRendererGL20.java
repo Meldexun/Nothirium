@@ -14,6 +14,8 @@ import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 
@@ -95,6 +97,13 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 		GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
 		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 		GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+	}
+
+	@Override
+	protected boolean isSpectator() {
+		Minecraft mc = Minecraft.getMinecraft();
+		Entity cameraEntity = mc.getRenderViewEntity();
+		return cameraEntity instanceof EntityPlayer && ((EntityPlayer) cameraEntity).isSpectator();
 	}
 
 }
