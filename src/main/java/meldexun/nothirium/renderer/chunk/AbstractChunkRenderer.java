@@ -32,7 +32,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 
 	@Override
 	public int renderedChunks(ChunkRenderPass pass) {
-		return chunks.stream().mapToInt(List::size).max().getAsInt();
+		return chunks.get(pass).size();
 	}
 
 	@Override
