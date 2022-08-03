@@ -30,6 +30,7 @@ import meldexun.renderlib.util.GLShader;
 import meldexun.renderlib.util.GLUtil;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -185,6 +186,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		GL30.glBindVertexArray(0);
 		GLShader.pop();
 
+		GlStateManager.resetColor();
 		Minecraft.getMinecraft().entityRenderer.disableLightmap();
 	}
 

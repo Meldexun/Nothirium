@@ -13,6 +13,7 @@ import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -55,6 +56,7 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 		resetClientState(pass);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
+		GlStateManager.resetColor();
 		Minecraft.getMinecraft().entityRenderer.disableLightmap();
 	}
 
