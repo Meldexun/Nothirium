@@ -12,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.mc.renderer.ChunkRenderManager;
-import meldexun.renderlib.renderer.EntityRenderManager;
-import meldexun.renderlib.renderer.TileEntityRenderManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiOverlayDebug;
 
@@ -36,13 +34,6 @@ public class MixinGuiOverlayDebug {
 			list.add(i + 3, String.format("  Cutout Mipped: %d", ChunkRenderManager.renderedSections(ChunkRenderPass.CUTOUT_MIPPED)));
 			list.add(i + 4, String.format("  Translucent: %d", ChunkRenderManager.renderedSections(ChunkRenderPass.TRANSLUCENT)));
 			list.add(i + 5, String.format("  Total: %d", ChunkRenderManager.totalSections()));
-		});
-		search(list, s -> s.startsWith("E:"), i -> {
-			list.set(i, String.format("Entities: %d/%d", EntityRenderManager.renderedEntities(), EntityRenderManager.totalEntities()));
-			list.add(i + 1, String.format("Tile Entities: %d/%d", TileEntityRenderManager.renderedTileEntities(), TileEntityRenderManager.totalTileEntities()));
-		});
-		search(list, s -> s.startsWith("P:"), i -> {
-			list.set(i, String.format("Particles: %s", this.mc.effectRenderer.getStatistics()));
 		});
 	}
 
