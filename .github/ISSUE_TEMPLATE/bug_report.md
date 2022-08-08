@@ -42,4 +42,5 @@ GPU:
 VRAM: 
 
 **Log File**
-Please use a paste site to upload the log file (for example https://gist.github.com/) and provide the link to the file here:
+Providing a log file is always necessary no matter if the game crashed or not. This also means that the crash report is not needed.
+Please use a paste site to upload the log file (for example https://gist.github.com/) and provide the link to the file here.
