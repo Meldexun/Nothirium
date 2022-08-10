@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Disclaimer: If applicable please set the `enableGLDebug` config option from RenderLib to true and try to reproduce the issue.
+Disclaimer: If applicable please set the `openGLDebugOutput -> enabled` config option from RenderLib to true and try to reproduce the issue.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
