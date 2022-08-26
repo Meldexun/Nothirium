@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import meldexun.nothirium.opengl.GLHelper;
+import meldexun.nothirium.opengl.GLTest;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -21,6 +22,7 @@ public class Nothirium {
 	@EventHandler
 	public void onFMLConstructionEvent(FMLConstructionEvent event) {
 		GLHelper.init();
+		GLTest.runTests();
 	}
 
 	@EventHandler

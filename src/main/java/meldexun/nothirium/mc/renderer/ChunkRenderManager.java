@@ -9,7 +9,7 @@ import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL43;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkDispatcher;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkProvider;
-import meldexun.nothirium.opengl.GLHelper;
+import meldexun.nothirium.opengl.GLTest;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 
@@ -39,7 +39,7 @@ public class ChunkRenderManager {
 			chunkRenderer = Optifine.initChunkRenderer(chunkRenderer);
 		} else {
 			if (chunkRenderer == null) {
-				if (GLHelper.isGL43Supported()) {
+				if (GLTest.glMultiDrawArraysIndirect) {
 					chunkRenderer = new ChunkRendererGL43();
 				} else {
 					chunkRenderer = new ChunkRendererGL20();

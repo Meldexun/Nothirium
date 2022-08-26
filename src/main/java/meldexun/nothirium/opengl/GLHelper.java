@@ -25,10 +25,6 @@ public class GLHelper {
 		glBufferSubData = new ReflectionField<>(ContextCapabilities.class, "glBufferSubData", "glBufferSubData").getLong(GLUtil.CAPS);
 	}
 
-	public static boolean isGL43Supported() {
-		return GLUtil.CAPS.OpenGL43;
-	}
-
 	public static void growBuffer(int vbo, long oldSize, long newSize) {
 		if (GLUtil.CAPS.OpenGL45) {
 			int temp = GL45.glCreateBuffers();
