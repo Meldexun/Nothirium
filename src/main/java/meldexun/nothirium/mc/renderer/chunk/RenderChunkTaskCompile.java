@@ -5,6 +5,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
 
+import git.jbredwards.fluidlogged_api.api.block.IFluidloggable;
+import git.jbredwards.fluidlogged_api.api.util.FluidState;
+import git.jbredwards.fluidlogged_api.api.util.FluidloggedUtils;
+import meldexun.nothirium.mc.integration.FluidloggedAPI;
 import org.lwjgl.opengl.GL11;
 
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
@@ -87,35 +91,14 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 					for (int z = 0; z < 16; z++) {
 						pos.setPos(this.renderChunk.getX() + x, this.renderChunk.getY() + y, this.renderChunk.getZ() + z);
 						IBlockState blockState = this.chunkCache.getBlockState(pos);
+						renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
 
-						if (blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
-							continue;
-						}
-
-						for (Direction dir : Direction.ALL) {
-							if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir)))
-								visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
-						}
-
-						// I will just quote another mod here "This is a ridiculously hacky workaround, I would not recommend it to anyone."
-						blockState.getBlock().hasTileEntity(blockState);
-
-						for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
-							if (Nothirium.isBetterFoliageInstalled ? !BetterFoliage.canRenderBlockInLayer(blockState.getBlock(), blockState, layer) : !blockState.getBlock().canRenderInLayer(blockState, layer)) {
-								continue;
+						if(FluidloggedAPI.isInstalled && FluidloggedUtils.getFluidFromState(blockState) == null) {
+	    					final FluidState fluidState = FluidState.get(pos);
+							if(!fluidState.isEmpty() && (!(fluidState.getBlock() instanceof IFluidloggable)
+									|| ((IFluidloggable)fluidState.getBlock()).shouldFluidRender(chunkCache, pos, blockState, fluidState))) {
+								renderBlockState(fluidState.getState(), pos, visibilityGraph, bufferBuilderPack, mc);
 							}
-							ForgeHooksClient.setRenderLayer(layer);
-							BufferBuilder bufferBuilder = bufferBuilderPack.getWorldRendererByLayer(layer);
-							if (!bufferBuilder.isDrawing) {
-								bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-								bufferBuilder.setTranslation(-this.renderChunk.getX(), -this.renderChunk.getY(), -this.renderChunk.getZ());
-							}
-							if (Nothirium.isBetterFoliageInstalled) {
-								BetterFoliage.renderWorldBlock(mc.getBlockRendererDispatcher(), blockState, pos, this.chunkCache, bufferBuilder, layer);
-							} else {
-								mc.getBlockRendererDispatcher().renderBlock(blockState, pos, this.chunkCache, bufferBuilder);
-							}
-							ForgeHooksClient.setRenderLayer(null);
 						}
 					}
 				}
@@ -190,4 +173,36 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 		}
 	}
 
+	//moved to its own method for Fluidlogged API's FluidState rendering
+	protected void renderBlockState(IBlockState blockState, MutableBlockPos pos, VisibilityGraph visibilityGraph, RegionRenderCacheBuilder bufferBuilderPack, Minecraft mc) {
+		if (blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
+			return;
+		}
+
+		for (Direction dir : Direction.ALL) {
+			if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir)))
+				visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
+		}
+
+		// I will just quote another mod here "This is a ridiculously hacky workaround, I would not recommend it to anyone."
+		blockState.getBlock().hasTileEntity(blockState);
+
+		for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
+			if (Nothirium.isBetterFoliageInstalled ? !BetterFoliage.canRenderBlockInLayer(blockState.getBlock(), blockState, layer) : !blockState.getBlock().canRenderInLayer(blockState, layer)) {
+				continue;
+			}
+			ForgeHooksClient.setRenderLayer(layer);
+			BufferBuilder bufferBuilder = bufferBuilderPack.getWorldRendererByLayer(layer);
+			if (!bufferBuilder.isDrawing) {
+				bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+				bufferBuilder.setTranslation(-this.renderChunk.getX(), -this.renderChunk.getY(), -this.renderChunk.getZ());
+			}
+			if (Nothirium.isBetterFoliageInstalled) {
+				BetterFoliage.renderWorldBlock(mc.getBlockRendererDispatcher(), blockState, pos, this.chunkCache, bufferBuilder, layer);
+			} else {
+				mc.getBlockRendererDispatcher().renderBlock(blockState, pos, this.chunkCache, bufferBuilder);
+			}
+			ForgeHooksClient.setRenderLayer(null);
+		}
+	}
 }
