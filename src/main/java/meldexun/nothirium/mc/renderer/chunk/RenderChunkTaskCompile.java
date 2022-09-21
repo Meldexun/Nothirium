@@ -95,8 +95,8 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 
 						if(FluidloggedAPI.isInstalled && FluidloggedUtils.getFluidFromState(blockState) == null) {
 	    					final FluidState fluidState = FluidState.get(pos);
-							if(!fluidState.isEmpty() && (!(fluidState.getBlock() instanceof IFluidloggable)
-									|| ((IFluidloggable)fluidState.getBlock()).shouldFluidRender(chunkCache, pos, blockState, fluidState))) {
+							if(!fluidState.isEmpty() && (!(blockState.getBlock() instanceof IFluidloggable)
+									|| ((IFluidloggable)blockState.getBlock()).shouldFluidRender(chunkCache, pos, blockState, fluidState))) {
 								renderBlockState(fluidState.getState(), pos, visibilityGraph, bufferBuilderPack, mc);
 							}
 						}
