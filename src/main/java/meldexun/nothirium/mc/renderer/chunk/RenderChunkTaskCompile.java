@@ -91,7 +91,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 						renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
 
 						if(Nothirium.isFluidloggedAPIInstalled)
-	    					FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState ->
+	    						FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState ->
 								renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
 					}
 				}
