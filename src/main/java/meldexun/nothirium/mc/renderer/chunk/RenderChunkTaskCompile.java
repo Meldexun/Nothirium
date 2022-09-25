@@ -5,9 +5,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
 
-import git.jbredwards.fluidlogged_api.api.block.IFluidloggable;
-import git.jbredwards.fluidlogged_api.api.util.FluidState;
-import git.jbredwards.fluidlogged_api.api.util.FluidloggedUtils;
 import meldexun.nothirium.mc.integration.FluidloggedAPI;
 import org.lwjgl.opengl.GL11;
 
@@ -93,13 +90,9 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 						IBlockState blockState = this.chunkCache.getBlockState(pos);
 						renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
 
-						if(FluidloggedAPI.isInstalled && FluidloggedUtils.getFluidFromState(blockState) == null) {
-	    					final FluidState fluidState = FluidState.get(pos);
-							if(!fluidState.isEmpty() && (!(blockState.getBlock() instanceof IFluidloggable)
-									|| ((IFluidloggable)blockState.getBlock()).shouldFluidRender(chunkCache, pos, blockState, fluidState))) {
-								renderBlockState(fluidState.getState(), pos, visibilityGraph, bufferBuilderPack, mc);
-							}
-						}
+						if(Nothirium.isFluidloggedAPIInstalled)
+	    					FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState ->
+								renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
 					}
 				}
 
