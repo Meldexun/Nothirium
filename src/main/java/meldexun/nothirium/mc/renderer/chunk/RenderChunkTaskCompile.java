@@ -5,7 +5,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
 
-import meldexun.nothirium.mc.integration.FluidloggedAPI;
 import org.lwjgl.opengl.GL11;
 
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
@@ -14,6 +13,7 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.BetterFoliage;
+import meldexun.nothirium.mc.integration.FluidloggedAPI;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
 import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
@@ -90,9 +90,9 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 						IBlockState blockState = this.chunkCache.getBlockState(pos);
 						renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
 
-						if(Nothirium.isFluidloggedAPIInstalled)
-	    						FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState ->
-								renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
+						if (Nothirium.isFluidloggedAPIInstalled) {
+							FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState -> renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
+						}
 					}
 				}
 
@@ -166,15 +166,15 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 		}
 	}
 
-	//moved to its own method for Fluidlogged API's FluidState rendering
-	protected void renderBlockState(IBlockState blockState, MutableBlockPos pos, VisibilityGraph visibilityGraph, RegionRenderCacheBuilder bufferBuilderPack, Minecraft mc) {
+	private void renderBlockState(IBlockState blockState, MutableBlockPos pos, VisibilityGraph visibilityGraph, RegionRenderCacheBuilder bufferBuilderPack, Minecraft mc) {
 		if (blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
 			return;
 		}
 
 		for (Direction dir : Direction.ALL) {
-			if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir)))
+			if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir))) {
 				visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
+			}
 		}
 
 		// I will just quote another mod here "This is a ridiculously hacky workaround, I would not recommend it to anyone."
@@ -198,4 +198,5 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 			ForgeHooksClient.setRenderLayer(null);
 		}
 	}
+
 }
