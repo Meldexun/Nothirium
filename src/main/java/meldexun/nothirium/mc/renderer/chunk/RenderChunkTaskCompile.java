@@ -13,6 +13,7 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.BetterFoliage;
+import meldexun.nothirium.mc.integration.FluidloggedAPI;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
 import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
@@ -87,35 +88,10 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 					for (int z = 0; z < 16; z++) {
 						pos.setPos(this.renderChunk.getX() + x, this.renderChunk.getY() + y, this.renderChunk.getZ() + z);
 						IBlockState blockState = this.chunkCache.getBlockState(pos);
+						renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
 
-						if (blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
-							continue;
-						}
-
-						for (Direction dir : Direction.ALL) {
-							if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir)))
-								visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
-						}
-
-						// I will just quote another mod here "This is a ridiculously hacky workaround, I would not recommend it to anyone."
-						blockState.getBlock().hasTileEntity(blockState);
-
-						for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
-							if (Nothirium.isBetterFoliageInstalled ? !BetterFoliage.canRenderBlockInLayer(blockState.getBlock(), blockState, layer) : !blockState.getBlock().canRenderInLayer(blockState, layer)) {
-								continue;
-							}
-							ForgeHooksClient.setRenderLayer(layer);
-							BufferBuilder bufferBuilder = bufferBuilderPack.getWorldRendererByLayer(layer);
-							if (!bufferBuilder.isDrawing) {
-								bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-								bufferBuilder.setTranslation(-this.renderChunk.getX(), -this.renderChunk.getY(), -this.renderChunk.getZ());
-							}
-							if (Nothirium.isBetterFoliageInstalled) {
-								BetterFoliage.renderWorldBlock(mc.getBlockRendererDispatcher(), blockState, pos, this.chunkCache, bufferBuilder, layer);
-							} else {
-								mc.getBlockRendererDispatcher().renderBlock(blockState, pos, this.chunkCache, bufferBuilder);
-							}
-							ForgeHooksClient.setRenderLayer(null);
+						if (Nothirium.isFluidloggedAPIInstalled) {
+							FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState -> renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
 						}
 					}
 				}
@@ -187,6 +163,39 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 		} catch (Throwable e) {
 			freeBuffer(bufferBuilderPack);
 			throw e;
+		}
+	}
+
+	private void renderBlockState(IBlockState blockState, MutableBlockPos pos, VisibilityGraph visibilityGraph, RegionRenderCacheBuilder bufferBuilderPack, Minecraft mc) {
+		if (blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
+			return;
+		}
+
+		for (Direction dir : Direction.ALL) {
+			if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir))) {
+				visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
+			}
+		}
+
+		// I will just quote another mod here "This is a ridiculously hacky workaround, I would not recommend it to anyone."
+		blockState.getBlock().hasTileEntity(blockState);
+
+		for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
+			if (Nothirium.isBetterFoliageInstalled ? !BetterFoliage.canRenderBlockInLayer(blockState.getBlock(), blockState, layer) : !blockState.getBlock().canRenderInLayer(blockState, layer)) {
+				continue;
+			}
+			ForgeHooksClient.setRenderLayer(layer);
+			BufferBuilder bufferBuilder = bufferBuilderPack.getWorldRendererByLayer(layer);
+			if (!bufferBuilder.isDrawing) {
+				bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+				bufferBuilder.setTranslation(-this.renderChunk.getX(), -this.renderChunk.getY(), -this.renderChunk.getZ());
+			}
+			if (Nothirium.isBetterFoliageInstalled) {
+				BetterFoliage.renderWorldBlock(mc.getBlockRendererDispatcher(), blockState, pos, this.chunkCache, bufferBuilder, layer);
+			} else {
+				mc.getBlockRendererDispatcher().renderBlock(blockState, pos, this.chunkCache, bufferBuilder);
+			}
+			ForgeHooksClient.setRenderLayer(null);
 		}
 	}
 

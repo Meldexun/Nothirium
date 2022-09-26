@@ -18,6 +18,7 @@ public class Nothirium {
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
 	public static boolean isBetterFoliageInstalled;
 	public static boolean isChunkAnimatorInstalled;
+	public static boolean isFluidloggedAPIInstalled;
 
 	@EventHandler
 	public void onFMLConstructionEvent(FMLConstructionEvent event) {
@@ -29,6 +30,7 @@ public class Nothirium {
 	public void onFMLPostInitializationEvent(FMLPostInitializationEvent event) {
 		isBetterFoliageInstalled = Loader.isModLoaded("betterfoliage");
 		isChunkAnimatorInstalled = Loader.isModLoaded("chunkanimator");
+		isFluidloggedAPIInstalled = Loader.isModLoaded("fluidlogged_api");
 	}
 
 }
