@@ -107,12 +107,14 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 			if (bufferBuilderPack.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT).isDrawing) {
 				BufferBuilder bufferBuilder = bufferBuilderPack.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
 				Entity entity = mc.getRenderViewEntity();
-				double x = entity.posX - renderChunk.getX();
-				double y = (entity.posY + entity.getEyeHeight()) - renderChunk.getY();
-				double z = entity.posZ - renderChunk.getZ();
-				// use translation to fix float inaccuracy
-				bufferBuilder.setTranslation(x, y, z);
-				bufferBuilder.sortVertexData(0.0F, 0.0F, 0.0F);
+				if (entity != null) {
+					double x = entity.posX - renderChunk.getX();
+					double y = (entity.posY + entity.getEyeHeight()) - renderChunk.getY();
+					double z = entity.posZ - renderChunk.getZ();
+					// use translation to fix float inaccuracy
+					bufferBuilder.setTranslation(x, y, z);
+					bufferBuilder.sortVertexData(0.0F, 0.0F, 0.0F);
+				}
 			}
 
 			if (this.canceled()) {
