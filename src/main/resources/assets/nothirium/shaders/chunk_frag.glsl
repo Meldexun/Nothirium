@@ -35,7 +35,7 @@ vec4 exp_fog(vec4 inColor, float vertexDistance) {
 }
 
 vec4 exp2_fog(vec4 inColor, float vertexDistance) {
-    float fogValue = clamp(1.0 - exp2(-u_FogDensity * vertexDistance * vertexDistance), 0.0, 1.0);
+    float fogValue = clamp(1.0 - exp(-u_FogDensity * u_FogDensity * vertexDistance * vertexDistance), 0.0, 1.0);
     return vec4(mix(inColor.rgb, u_FogColor.rgb, fogValue * u_FogColor.a), inColor.a);
 }
 
