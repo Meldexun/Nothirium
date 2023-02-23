@@ -1,12 +1,11 @@
 package meldexun.nothirium.mc.util;
 
-import java.nio.FloatBuffer;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import meldexun.renderlib.util.GLShader;
 import meldexun.renderlib.util.GLUtil;
+import meldexun.renderlib.util.MemoryAccess;
 
 public class FogUtil {
 
@@ -43,8 +42,9 @@ public class FogUtil {
 				GL20.glUniform1i(shader.getUniform(U_FOGMODE), EXP2_FOG);
 				GL20.glUniform1f(shader.getUniform(U_FOGDENSITY), GL11.glGetFloat(GL11.GL_FOG_DENSITY));
 			}
-			FloatBuffer fogColor = GLUtil.getFloat(GL11.GL_FOG_COLOR);
-			GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.get(0), fogColor.get(1), fogColor.get(2), fogColor.get(3));
+			MemoryAccess fogColor = GLUtil.getFloat(GL11.GL_FOG_COLOR);
+			GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.getFloat(0), fogColor.getFloat(4),
+					fogColor.getFloat(8), fogColor.getFloat(12));
 		}
 	}
 

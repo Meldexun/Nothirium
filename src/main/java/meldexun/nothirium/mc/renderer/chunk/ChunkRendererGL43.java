@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GLSync;
 import org.lwjgl.util.vector.Vector3f;
 
 import meldexun.matrixutil.Matrix4f;
+import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.Nothirium;
@@ -156,15 +157,18 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 			cameraY -= offset.y;
 			cameraZ -= offset.z;
 		}
-		offsetBuffers.get().get(pass).getFloatBuffer()
-				.put(index * 3, (float) (renderChunk.getX() - cameraX))
-				.put(index * 3 + 1, (float) (renderChunk.getY() - cameraY))
-				.put(index * 3 + 2, (float) (renderChunk.getZ() - cameraZ));
-		commandBuffers.get().get(pass).getIntBuffer()
-				.put(index * 4, renderChunk.getVBOPart(pass).getCount())
-				.put(index * 4 + 1, 1)
-				.put(index * 4 + 2, renderChunk.getVBOPart(pass).getFirst())
-				.put(index * 4 + 3, index);
+
+		GLBuffer offsetBuffer = offsetBuffers.get().get(pass);
+		offsetBuffer.putFloat(index * 12, (float) (renderChunk.getX() - cameraX));
+		offsetBuffer.putFloat(index * 12 + 4, (float) (renderChunk.getY() - cameraY));
+		offsetBuffer.putFloat(index * 12 + 8, (float) (renderChunk.getZ() - cameraZ));
+
+		IVBOPart vboPart = renderChunk.getVBOPart(pass);
+		GLBuffer commandBuffer = commandBuffers.get().get(pass);
+		commandBuffer.putInt(index * 16, vboPart.getCount());
+		commandBuffer.putInt(index * 16 + 4, 1);
+		commandBuffer.putInt(index * 16 + 8, vboPart.getFirst());
+		commandBuffer.putInt(index * 16 + 12, index);
 	}
 
 	@Override
