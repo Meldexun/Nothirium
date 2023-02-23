@@ -16,4 +16,8 @@ public interface IVBOPart {
 
 	boolean isValid();
 
+	default int getQuadCount() {
+		return getCount() >> 2;
+	}
+
 }

@@ -21,6 +21,7 @@ import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VisibilityGraph;
 import meldexun.nothirium.util.VisibilitySet;
 import meldexun.renderlib.util.BufferUtil;
+import meldexun.renderlib.util.UnsafeBuffer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -105,15 +106,12 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 			VisibilitySet visibilitySet = visibilityGraph.compute();
 
 			if (bufferBuilderPack.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT).isDrawing) {
-				BufferBuilder bufferBuilder = bufferBuilderPack.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
 				Entity entity = mc.getRenderViewEntity();
 				if (entity != null) {
-					double x = entity.posX - renderChunk.getX();
-					double y = (entity.posY + entity.getEyeHeight()) - renderChunk.getY();
-					double z = entity.posZ - renderChunk.getZ();
-					// use translation to fix float inaccuracy
-					bufferBuilder.setTranslation(x, y, z);
-					bufferBuilder.sortVertexData(0.0F, 0.0F, 0.0F);
+					BufferBuilder bufferBuilder = bufferBuilderPack
+							.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
+					RenderChunkTaskSortTranslucent.sortVertexData(renderChunk, bufferBuilder.getVertexCount() / 4,
+							new UnsafeBuffer<>(bufferBuilder.getByteBuffer()), entity.getPositionEyes(1.0F));
 				}
 			}
 
