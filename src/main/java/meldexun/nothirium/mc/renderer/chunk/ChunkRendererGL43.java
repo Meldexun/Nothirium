@@ -46,9 +46,15 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	private static final String U_BLOCKTEX = "u_BlockTex";
 	private static final String U_LIGHTTEX = "u_LightTex";
 	private static final String U_MATRIX = "u_ModelViewProjectionMatrix";
-	private final GLShader shader = new GLShader.Builder().addShader(GL20.GL_VERTEX_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_vert.glsl")))
-			.addShader(GL20.GL_FRAGMENT_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_frag.glsl"))).bindAttribute(A_POS, 0).bindAttribute(A_COLOR, 1)
-			.bindAttribute(A_TEXCOORD, 2).bindAttribute(A_LIGHTCOORD, 3).bindAttribute(A_OFFSET, 4).build(p -> {
+	private final GLShader shader = new GLShader.Builder()
+			.addShader(GL20.GL_VERTEX_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_vert.glsl")))
+			.addShader(GL20.GL_FRAGMENT_SHADER, new ResourceSupplier(new ResourceLocation(Nothirium.MODID, "shaders/chunk_frag.glsl")))
+			.bindAttribute(A_POS, 0)
+			.bindAttribute(A_COLOR, 1)
+			.bindAttribute(A_TEXCOORD, 2)
+			.bindAttribute(A_LIGHTCOORD, 3)
+			.bindAttribute(A_OFFSET, 4)
+			.build(p -> {
 				GL20.glUniform1i(p.getUniform(U_BLOCKTEX), 0);
 				GL20.glUniform1i(p.getUniform(U_LIGHTTEX), 1);
 			});
