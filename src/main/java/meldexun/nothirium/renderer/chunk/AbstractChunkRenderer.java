@@ -20,7 +20,7 @@ import meldexun.renderlib.util.Frustum;
 
 public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> implements IChunkRenderer<T> {
 
-	private final Queue<T> chunkQueue = new ArrayDeque<T>(1024);
+	private final Queue<T> chunkQueue = new ArrayDeque<>();
 	private double lastTransparencyResortX;
 	private double lastTransparencyResortY;
 	private double lastTransparencyResortZ;
