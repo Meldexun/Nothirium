@@ -1,4 +1,4 @@
-package meldexun.nothirium.mc.mixin;
+package meldexun.nothirium.mc.mixin.optifine;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -8,13 +8,13 @@
   ],
   "client": [
     "optifine.MixinDynamicLight",
+    "optifine.MixinEntityRenderer",
     "vertex.MixinBufferBuilder",
     "vertex.MixinVertexFormat",
     "vertex.MixinVertexFormatElement",
     "MixinBetterBiomeBlend",
     "MixinBlock",
     "MixinChunkProviderClient",
-    "MixinEntityRenderer",
     "MixinGuiOverlayDebug",
     "MixinRenderGlobal"
   ],
