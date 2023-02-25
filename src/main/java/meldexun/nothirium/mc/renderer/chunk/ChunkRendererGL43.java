@@ -7,11 +7,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GLSync;
 import org.lwjgl.util.vector.Vector3f;
 
 import meldexun.matrixutil.Matrix4f;
@@ -24,6 +22,7 @@ import meldexun.nothirium.mc.util.FogUtil;
 import meldexun.nothirium.mc.util.ResourceSupplier;
 import meldexun.nothirium.util.collection.Enum2IntMap;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
+import meldexun.nothirium.util.collection.IntMultiObject;
 import meldexun.nothirium.util.collection.MultiObject;
 import meldexun.renderlib.util.Frustum;
 import meldexun.renderlib.util.GLBuffer;
@@ -65,7 +64,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	private final MultiObject<Enum2ObjMap<ChunkRenderPass, GLBuffer>> offsetBuffers;
 	private final MultiObject<Enum2ObjMap<ChunkRenderPass, GLBuffer>> commandBuffers;
 
-	private final MultiObject<GLSync> syncs;
+	private final IntMultiObject syncs;
 
 	public ChunkRendererGL43() {
 		this(2);
@@ -75,7 +74,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		this.vaos = new MultiObject<>(bufferCount, i -> new Enum2IntMap<>(ChunkRenderPass.class));
 		this.offsetBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
 		this.commandBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
-		this.syncs = new MultiObject<>(bufferCount);
+		this.syncs = new IntMultiObject(bufferCount, i -> -1);
 	}
 
 	@Override
@@ -128,10 +127,10 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		offsetBuffers.get().forEach(b -> b.map(GL30.GL_MAP_WRITE_BIT, GL15.GL_WRITE_ONLY));
 		commandBuffers.get().forEach(b -> b.map(GL30.GL_MAP_WRITE_BIT, GL15.GL_WRITE_ONLY));
 
-		if (syncs.get() != null) {
-			GL32.glClientWaitSync(syncs.get(), 0, Long.MAX_VALUE);
-			GL32.glDeleteSync(syncs.get());
-			syncs.set(null);
+		if (syncs.getInt() != -1) {
+			GL33.glGetQueryObjecti64(syncs.getInt(), GL15.GL_QUERY_RESULT);
+			GL15.glDeleteQueries(syncs.getInt());
+			syncs.set(-1);
 		}
 
 		this.chunks.forEach((pass, list) -> {
@@ -187,9 +186,11 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 
 		GL43.glMultiDrawArraysIndirect(GL11.GL_QUADS, 0, chunks.get(pass).size(), 0);
 		if (pass == ChunkRenderPass.TRANSLUCENT) {
-			if (syncs.get() != null)
-				GL32.glDeleteSync(syncs.get());
-			syncs.set(GL32.glFenceSync(GL32.GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
+			if (syncs.getInt() != -1)
+				GL15.glDeleteQueries(syncs.getInt());
+			int query = GL15.glGenQueries();
+			GL33.glQueryCounter(query, GL33.GL_TIMESTAMP);
+			syncs.set(query);
 		}
 
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, 0);
@@ -207,7 +208,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		offsetBuffers.stream().flatMap(Enum2ObjMap::stream).filter(Objects::nonNull).forEach(GLBuffer::dispose);
 		commandBuffers.stream().flatMap(Enum2ObjMap::stream).filter(Objects::nonNull).forEach(GLBuffer::dispose);
 		vaos.stream().flatMapToInt(Enum2IntMap::streamInt).forEach(GL30::glDeleteVertexArrays);
-		syncs.stream().filter(Objects::nonNull).forEach(GL32::glDeleteSync);
+		syncs.streamInt().filter(i -> i != -1).forEach(GL15::glDeleteQueries);
 	}
 
 	@Override
