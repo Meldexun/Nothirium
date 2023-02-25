@@ -7,6 +7,9 @@
   "mixins": [
   ],
   "client": [
+    "vertex.MixinBufferBuilder",
+    "vertex.MixinVertexFormat",
+    "vertex.MixinVertexFormatElement",
     "MixinBetterBiomeBlend",
     "MixinBlock",
     "MixinChunkProviderClient",

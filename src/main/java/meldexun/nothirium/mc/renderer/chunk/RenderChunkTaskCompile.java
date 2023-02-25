@@ -110,8 +110,8 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 				if (entity != null) {
 					BufferBuilder bufferBuilder = bufferBuilderPack
 							.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
-					RenderChunkTaskSortTranslucent.sortVertexData(renderChunk, bufferBuilder.getVertexCount() / 4,
-							new UnsafeBuffer<>(bufferBuilder.getByteBuffer()), entity.getPositionEyes(1.0F));
+					RenderChunkTaskSortTranslucent.sortVertexData(new UnsafeBuffer<>(bufferBuilder.getByteBuffer()),
+							bufferBuilder.getVertexCount() / 4, renderChunk, entity.getPositionEyes(1.0F));
 				}
 			}
 

@@ -47,7 +47,7 @@ public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<Rend
 			return RenderChunkTaskResult.CANCELLED;
 		}
 
-		sortVertexData(renderChunk, vboPart.getQuadCount(), vertexData, entity.getPositionEyes(1.0F));
+		sortVertexData(vertexData, vboPart.getQuadCount(), renderChunk, entity.getPositionEyes(1.0F));
 
 		taskDispatcher.runOnRenderThread(() -> {
 			if (!this.canceled() && vboPart.isValid()) {
@@ -61,8 +61,13 @@ public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<Rend
 		return RenderChunkTaskResult.SUCCESSFUL;
 	}
 
-	public static void sortVertexData(RenderChunk renderChunk, int quadCount, MemoryAccess vertexData, Vec3d camera) {
-		int[] quadOrder = createQuadOrder(renderChunk, quadCount, vertexData, camera);
+	public static void sortVertexData(MemoryAccess vertexData, int quadCount, RenderChunk renderChunk, Vec3d camera) {
+		sortVertexData(vertexData, quadCount, (float) (renderChunk.getX() - camera.x),
+				(float) (renderChunk.getY() - camera.y), (float) (renderChunk.getZ() - camera.z));
+	}
+
+	public static void sortVertexData(MemoryAccess vertexData, int quadCount, float dx, float dy, float dz) {
+		int[] quadOrder = createQuadOrder(vertexData, quadCount, dx, dy, dz);
 
 		int bytesPerQuad = DefaultVertexFormats.BLOCK.getSize() * 4;
 		UnsafeBuffer<ByteBuffer> tempBuffer = new UnsafeBuffer<>(BufferUtil.allocate(bytesPerQuad));
@@ -88,9 +93,8 @@ public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<Rend
 	}
 
 	@SuppressWarnings("serial")
-	private static int[] createQuadOrder(RenderChunk renderChunk, int quadCount, MemoryAccess vertexData,
-			Vec3d camera) {
-		float[] quadSqrDistToCam = createQuadSqrDistToCamMapping(renderChunk, quadCount, vertexData, camera);
+	private static int[] createQuadOrder(MemoryAccess vertexData, int quadCount, float dx, float dy, float dz) {
+		float[] quadSqrDistToCam = createQuadSqrDistToCamMapping(vertexData, quadCount, dx, dy, dz);
 
 		int[] quadOrder = IntStream.range(0, quadCount).toArray();
 		IntArrays.mergeSort(quadOrder, new AbstractIntComparator() {
@@ -103,11 +107,8 @@ public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<Rend
 		return quadOrder;
 	}
 
-	private static float[] createQuadSqrDistToCamMapping(RenderChunk renderChunk, int quadCount,
-			MemoryAccess vertexData, Vec3d camera) {
-		float dx = (float) (renderChunk.getX() - camera.x);
-		float dy = (float) (renderChunk.getY() - camera.y);
-		float dz = (float) (renderChunk.getZ() - camera.z);
+	private static float[] createQuadSqrDistToCamMapping(MemoryAccess vertexData, int quadCount, float dx, float dy,
+			float dz) {
 		int bytesPerVertex = DefaultVertexFormats.BLOCK.getSize();
 
 		float[] quadSqrDistToCam = new float[quadCount];
