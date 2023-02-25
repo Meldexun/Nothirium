@@ -7,6 +7,7 @@
   "mixins": [
   ],
   "client": [
+    "optifine.MixinDynamicLight",
     "vertex.MixinBufferBuilder",
     "vertex.MixinVertexFormat",
     "vertex.MixinVertexFormatElement",

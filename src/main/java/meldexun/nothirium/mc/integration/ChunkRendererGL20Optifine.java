@@ -18,9 +18,9 @@ public class ChunkRendererGL20Optifine extends ChunkRendererGL20 {
 
 	@Override
 	public void setup(IRenderChunkProvider<RenderChunk> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
-		// if (Optifine.IS_DYNAMIC_LIGHTS.invoke(null)) {
-		// Optifine.DYNAMIC_LIGHTS_UPDATE.invoke(null, Minecraft.getMinecraft().renderGlobal);
-		// }
+		if (Optifine.IS_DYNAMIC_LIGHTS.invoke(null)) {
+			Optifine.DYNAMIC_LIGHTS_UPDATE.invoke(null, Minecraft.getMinecraft().renderGlobal);
+		}
 
 		super.setup(renderChunkProvider, cameraX, cameraY, cameraZ, frustum, Optifine.IS_SHADOW_PASS.getBoolean(null) ? -frame : frame);
 	}

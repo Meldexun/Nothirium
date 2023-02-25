@@ -8,7 +8,9 @@ import meldexun.nothirium.opengl.GLTest;
 import meldexun.reflectionutil.ReflectionField;
 import meldexun.reflectionutil.ReflectionMethod;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.BlockPos;
 
 public class Optifine {
 
@@ -29,6 +31,9 @@ public class Optifine {
 	public static final ReflectionField<Boolean> FOG_STANDARD = new ReflectionField<>("net.minecraft.client.renderer.EntityRenderer", "fogStandard", "fogStandard");
 	public static final ReflectionMethod<Boolean> IS_SHADERS = new ReflectionMethod<>("Config", "isShaders", "isShaders");
 	public static final ReflectionMethod<Boolean> IS_DYNAMIC_LIGHTS = new ReflectionMethod<>("Config", "isDynamicLights", "isDynamicLights");
+	public static final ReflectionMethod<Boolean> IS_DYNAMIC_LIGHTS_FAST = new ReflectionMethod<>("Config", "isDynamicLightsFast", "isDynamicLightsFast");
+	public static final ReflectionMethod<Integer> GET_LIGHT_LEVEL = new ReflectionMethod<>("net.optifine.DynamicLights", "getLightLevel", "getLightLevel", Entity.class);
+	public static final ReflectionMethod<Integer> GET_COMBINED_LIGHT = new ReflectionMethod<>("net.optifine.DynamicLights", "getCombinedLight", "getCombinedLight", BlockPos.class, int.class);
 	public static final ReflectionMethod<Void> DYNAMIC_LIGHTS_UPDATE = new ReflectionMethod<>("net.optifine.DynamicLights", "update", "update", RenderGlobal.class);
 	public static final ReflectionMethod<Void> PRE_RENDER_CHUNK_LAYER = new ReflectionMethod<>("net.optifine.shaders.ShadersRender", "preRenderChunkLayer", "preRenderChunkLayer", BlockRenderLayer.class);
 	public static final ReflectionMethod<Void> SETUP_ARRAY_POINTERS_VBO = new ReflectionMethod<>("net.optifine.shaders.ShadersRender", "setupArrayPointersVbo", "setupArrayPointersVbo");
