@@ -51,20 +51,6 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 	}
 
 	@Override
-	public boolean isFaceCulled(double cameraX, double cameraY, double cameraZ, Direction direction) {
-		if (direction.getAxis() == Axis.Y) {
-			if (direction == Direction.UP) {
-				if (this.getY() == 240 && cameraY < 256.0D)
-					return true;
-			} else {
-				if (this.getY() == 0 && cameraY > 0.0D)
-					return true;
-			}
-		}
-		return super.isFaceCulled(cameraX, cameraY, cameraZ, direction);
-	}
-
-	@Override
 	@Nullable
 	public RenderChunkTaskCompile createCompileTask(IChunkRenderer<?> chunkRenderer, IRenderChunkDispatcher taskDispatcher) {
 		if (this.getY() < 0 || this.getY() >= 256) {

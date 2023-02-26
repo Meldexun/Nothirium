@@ -1,13 +1,45 @@
 package meldexun.nothirium.util;
 
+import meldexun.nothirium.api.renderer.chunk.IRenderChunk;
+
 public enum Direction {
 
-	DOWN(0, Axis.Y),
-	UP(1, Axis.Y),
-	NORTH(2, Axis.Z),
-	SOUTH(3, Axis.Z),
-	WEST(4, Axis.X),
-	EAST(5, Axis.X);
+	DOWN(0, Axis.Y) {
+		@Override
+		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+			return renderChunk.getY() >= 256 || cameraY > renderChunk.getY();
+		}
+	},
+	UP(1, Axis.Y) {
+		@Override
+		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+			return renderChunk.getY() < 0 || cameraY < renderChunk.getY() + 16;
+		}
+	},
+	NORTH(2, Axis.Z) {
+		@Override
+		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+			return cameraZ > renderChunk.getZ();
+		}
+	},
+	SOUTH(3, Axis.Z) {
+		@Override
+		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+			return cameraZ < renderChunk.getZ() + 16;
+		}
+	},
+	WEST(4, Axis.X) {
+		@Override
+		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+			return cameraX > renderChunk.getX();
+		}
+	},
+	EAST(5, Axis.X) {
+		@Override
+		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+			return cameraX < renderChunk.getX() + 16;
+		}
+	};
 
 	static {
 		WEST.opposite = EAST;
@@ -65,5 +97,7 @@ public enum Direction {
 			return z < 0.0F ? NORTH : SOUTH;
 		}
 	}
+
+	public abstract boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ);
 
 }

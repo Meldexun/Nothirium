@@ -136,28 +136,6 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 		this.visibilitySet = visibilitySet;
 	}
 
-	public boolean isFaceCulled(double cameraX, double cameraY, double cameraZ, Direction direction) {
-		if (direction.getAxis() == Axis.X) {
-			if (direction == Direction.WEST) {
-				return cameraX > x;
-			} else {
-				return cameraX < x + 16;
-			}
-		} else if (direction.getAxis() == Axis.Y) {
-			if (direction == Direction.DOWN) {
-				return cameraY > y;
-			} else {
-				return cameraY < y + 16;
-			}
-		} else {
-			if (direction == Direction.NORTH) {
-				return cameraZ > z;
-			} else {
-				return cameraZ < z + 16;
-			}
-		}
-	}
-
 	public boolean isFogCulled(double cameraX, double cameraY, double cameraZ, double fogEnd) {
 		double x = MathUtil.clamp(cameraX, this.x, this.x + 16) - cameraX;
 		double y = MathUtil.clamp(cameraY, this.y, this.y + 16) - cameraY;

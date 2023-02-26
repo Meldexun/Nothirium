@@ -63,7 +63,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 					continue;
 				if (neighbor.lastTimeRecorded == frame)
 					continue;
-				if (neighbor.isFaceCulled(cameraX, cameraY, cameraZ, direction.opposite()))
+				if (direction.opposite().isFaceCulled(neighbor, cameraX, cameraY, cameraZ))
 					continue;
 				if (!spectator && !renderChunk.isVisibleFromAnyOrigin(direction))
 					continue;
