@@ -1,7 +1,7 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.ToIntFunction;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -75,6 +75,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		this.offsetBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
 		this.commandBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
 		this.syncs = new IntMultiObject(bufferCount, i -> -1);
+		this.vbos.forEach((pass, vbo) -> vbo.addListener(() -> this.initVAOs(pass)));
 	}
 
 	@Override
@@ -93,8 +94,13 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		commandBuffers.stream().flatMap(Enum2ObjMap::stream).filter(Objects::nonNull).forEach(GLBuffer::dispose);
 		commandBuffers.forEach(e -> e.fill(pass -> new GLBuffer(renderDistance3 * 16, GL30.GL_MAP_WRITE_BIT, GL15.GL_STREAM_DRAW, true, GL30.GL_MAP_WRITE_BIT)));
 
-		vaos.stream().flatMapToInt(Enum2IntMap::streamInt).forEach(GL30::glDeleteVertexArrays);
-		vaos.forEach((i, e) -> e.fill((ToIntFunction<ChunkRenderPass>) pass -> {
+		Arrays.stream(ChunkRenderPass.ALL).forEach(this::initVAOs);
+	}
+
+	private void initVAOs(ChunkRenderPass pass) {
+		vaos.forEach((i, e) -> {
+			GL30.glDeleteVertexArrays(e.getInt(pass));
+
 			int vao = GL30.glGenVertexArrays();
 			GL30.glBindVertexArray(vao);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbos.get(pass).getVbo());
@@ -112,8 +118,8 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 			GL33.glVertexAttribDivisor(shader.getAttribute(A_OFFSET), 1);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 			GL30.glBindVertexArray(0);
-			return vao;
-		}));
+			e.set(pass, vao);
+		});
 	}
 
 	@Override
