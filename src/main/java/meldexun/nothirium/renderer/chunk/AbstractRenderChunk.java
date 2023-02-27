@@ -13,7 +13,6 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunk;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkTask;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
-import meldexun.nothirium.util.Axis;
 import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VisibilitySet;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
@@ -76,6 +75,7 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 			this.y = y;
 			this.z = z;
 			this.releaseBuffers();
+			this.markDirty();
 			return true;
 		}
 		return false;
@@ -205,7 +205,6 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	public void releaseBuffers() {
 		this.cancelTask();
 		Arrays.stream(ChunkRenderPass.ALL).forEach(pass -> this.setVBOPart(pass, null));
-		this.markDirty();
 	}
 
 	protected boolean canCompile() {
