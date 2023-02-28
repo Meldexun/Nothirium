@@ -31,9 +31,11 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 
 	@Override
 	public void markDirty() {
-		if (this.getY() >= 0 && this.getY() < 256) {
-			super.markDirty();
+		if (this.getY() < 0 || this.getY() >= 256) {
+			this.getVisibility().setAllVisible();
+			return;
 		}
+		super.markDirty();
 	}
 
 	@Override
