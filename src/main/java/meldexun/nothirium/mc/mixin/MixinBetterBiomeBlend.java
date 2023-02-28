@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import meldexun.nothirium.mc.renderer.chunk.RenderChunk;
+import meldexun.nothirium.mc.renderer.chunk.SectionRenderCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -16,8 +16,8 @@ public class MixinBetterBiomeBlend {
 
 	@Inject(method = "getWorldFromBlockAccess", remap = false, require = 1, cancellable = true, at = @At("HEAD"))
 	private static void getWorldFromBlockAccess(IBlockAccess blockAccess, CallbackInfoReturnable<World> info) {
-		if (blockAccess instanceof RenderChunk.ChunkCache) {
-			info.setReturnValue(((RenderChunk.ChunkCache) blockAccess).getWorld());
+		if (blockAccess instanceof SectionRenderCache) {
+			info.setReturnValue(((SectionRenderCache) blockAccess).getWorld());
 		}
 	}
 
