@@ -102,7 +102,7 @@ public abstract class MixinBufferBuilder implements ExtendedBufferBuilder {
 	}
 
 	@Overwrite
-	private void nextVertexFormatIndex() {
+	public void nextVertexFormatIndex() {
 		if (++vertexFormatIndex == vertexFormat.getElementCount()) {
 			vertexFormatIndex = 0;
 		}
