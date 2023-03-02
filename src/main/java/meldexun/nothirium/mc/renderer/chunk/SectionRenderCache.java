@@ -30,7 +30,7 @@ public class SectionRenderCache implements IBlockAccess {
 
 	private static final ArrayCache<IBlockState> BLOCK = new ArrayCache<>(18 * 18 * 18, IBlockState[]::new, null);
 	private static final IntArrayCache LIGHT = new IntArrayCache(18 * 18 * 18, -1);
-	private static final ArrayCache<Biome> BIOME = new ArrayCache<>(18 * 18, Biome[]::new, null);
+	private static final ArrayCache<Biome> BIOME = new ArrayCache<>(48 * 48, Biome[]::new, null);
 	protected final World world;
 	protected final SectionPos sectionPos;
 	protected final Cache2D<Chunk> chunkCache;
@@ -74,7 +74,7 @@ public class SectionRenderCache implements IBlockAccess {
 		int maxZ = sectionPos.getBlockZ() + 15;
 		this.blockCache = new Cache3D<>(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, Blocks.AIR.getDefaultState(), size -> BLOCK.get());
 		this.lightCache = new IntCache3D(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, 0, size -> LIGHT.get());
-		this.biomeCache = new Cache2D<>(minX - 1, minZ - 1, maxX + 1, maxZ + 1, Biomes.PLAINS, size -> BIOME.get());
+		this.biomeCache = new Cache2D<>(minX - 16, minZ - 16, maxX + 16, maxZ + 16, Biomes.PLAINS, size -> BIOME.get());
 	}
 
 	public void freeCaches() {
