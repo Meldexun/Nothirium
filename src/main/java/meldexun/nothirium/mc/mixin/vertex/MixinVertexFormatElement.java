@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import meldexun.nothirium.mc.vertex.ColorUploader;
 import meldexun.nothirium.mc.vertex.ExtendedVertexFormatElement;
-import meldexun.nothirium.mc.vertex.LightmapCoordinateUploader;
 import meldexun.nothirium.mc.vertex.NormalUploader;
 import meldexun.nothirium.mc.vertex.PositionUploader;
 import meldexun.nothirium.mc.vertex.TextureCoordinateUploader;
@@ -49,11 +48,7 @@ public class MixinVertexFormatElement implements ExtendedVertexFormatElement {
 			vertexConsumer = ColorUploader.fromType(type);
 			break;
 		case UV:
-			if (index == 0) {
-				vertexConsumer = TextureCoordinateUploader.fromType(type);
-			} else if (index == 1) {
-				vertexConsumer = LightmapCoordinateUploader.fromType(type);
-			}
+			vertexConsumer = TextureCoordinateUploader.fromType(type);
 			break;
 		case NORMAL:
 			vertexConsumer = NormalUploader.fromType(type);

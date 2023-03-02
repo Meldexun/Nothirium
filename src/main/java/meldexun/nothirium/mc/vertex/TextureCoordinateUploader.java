@@ -14,6 +14,14 @@ public class TextureCoordinateUploader {
 			unsafe.putFloat(address, (float) u);
 			unsafe.putFloat(address + 4, (float) v);
 		}
+
+		@Override
+		public void lightmap(ExtendedBufferBuilder buffer, int skyLight, int blockLight) {
+			Unsafe unsafe = UnsafeUtil.UNSAFE;
+			long address = buffer.getAddress() + buffer.getOffset();
+			unsafe.putFloat(address, (float) skyLight);
+			unsafe.putFloat(address + 4, (float) blockLight);
+		}
 	};
 	private static final VertexConsumer INT = new VertexConsumer() {
 		@Override
@@ -22,6 +30,14 @@ public class TextureCoordinateUploader {
 			long address = buffer.getAddress() + buffer.getOffset();
 			unsafe.putInt(address, (int) u);
 			unsafe.putInt(address + 4, (int) v);
+		}
+
+		@Override
+		public void lightmap(ExtendedBufferBuilder buffer, int skyLight, int blockLight) {
+			Unsafe unsafe = UnsafeUtil.UNSAFE;
+			long address = buffer.getAddress() + buffer.getOffset();
+			unsafe.putInt(address, skyLight);
+			unsafe.putInt(address + 4, blockLight);
 		}
 	};
 	private static final VertexConsumer SHORT = new VertexConsumer() {
@@ -32,6 +48,14 @@ public class TextureCoordinateUploader {
 			unsafe.putShort(address, (short) ((int) v));
 			unsafe.putShort(address + 2, (short) ((int) u));
 		}
+
+		@Override
+		public void lightmap(ExtendedBufferBuilder buffer, int skyLight, int blockLight) {
+			Unsafe unsafe = UnsafeUtil.UNSAFE;
+			long address = buffer.getAddress() + buffer.getOffset();
+			unsafe.putShort(address, (short) blockLight);
+			unsafe.putShort(address + 2, (short) skyLight);
+		}
 	};
 	private static final VertexConsumer BYTE = new VertexConsumer() {
 		@Override
@@ -40,6 +64,14 @@ public class TextureCoordinateUploader {
 			long address = buffer.getAddress() + buffer.getOffset();
 			unsafe.putByte(address, (byte) ((int) v));
 			unsafe.putByte(address + 1, (byte) ((int) u));
+		}
+
+		@Override
+		public void lightmap(ExtendedBufferBuilder buffer, int skyLight, int blockLight) {
+			Unsafe unsafe = UnsafeUtil.UNSAFE;
+			long address = buffer.getAddress() + buffer.getOffset();
+			unsafe.putByte(address, (byte) blockLight);
+			unsafe.putByte(address + 1, (byte) skyLight);
 		}
 	};
 
