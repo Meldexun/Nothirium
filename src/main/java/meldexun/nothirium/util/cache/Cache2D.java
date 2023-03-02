@@ -111,4 +111,8 @@ public class Cache2D<V> {
 		return v;
 	}
 
+	public V[] getData() {
+		return data;
+	}
+
 }

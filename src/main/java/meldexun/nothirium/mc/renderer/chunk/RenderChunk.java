@@ -53,7 +53,7 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 		if (blockStorage == null || blockStorage.isEmpty()) {
 			return null;
 		}
-		return new RenderChunkTaskCompile(chunkRenderer, taskDispatcher, this, new SectionRenderCache(mc.world, SectionPos.of(this.getX() >> 4, this.getY() >> 4, this.getZ() >> 4), 1));
+		return new RenderChunkTaskCompile(chunkRenderer, taskDispatcher, this, new SectionRenderCache(mc.world, SectionPos.of(this.getX() >> 4, this.getY() >> 4, this.getZ() >> 4)));
 	}
 
 	@Override

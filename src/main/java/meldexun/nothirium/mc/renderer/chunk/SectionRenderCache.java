@@ -1,14 +1,14 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.util.stream.IntStream;
-
 import javax.annotation.Nullable;
 
 import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.util.LightUtil;
 import meldexun.nothirium.util.SectionPos;
+import meldexun.nothirium.util.cache.ArrayCache;
 import meldexun.nothirium.util.cache.Cache2D;
 import meldexun.nothirium.util.cache.Cache3D;
+import meldexun.nothirium.util.cache.IntArrayCache;
 import meldexun.nothirium.util.cache.IntCache3D;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -28,29 +28,26 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
 public class SectionRenderCache implements IBlockAccess {
 
+	private static final ArrayCache<IBlockState> BLOCK = new ArrayCache<>(18 * 18 * 18, IBlockState[]::new, null);
+	private static final IntArrayCache LIGHT = new IntArrayCache(18 * 18 * 18, -1);
+	private static final ArrayCache<Biome> BIOME = new ArrayCache<>(18 * 18, Biome[]::new, null);
 	protected final World world;
 	protected final SectionPos sectionPos;
 	protected final Cache2D<Chunk> chunkCache;
 	protected final Cache3D<ExtendedBlockStorage> sectionCache;
-	protected final Cache3D<IBlockState> blockCache;
-	protected final IntCache3D lightCache;
-	protected final Cache2D<Biome> biomeCache;
+	protected Cache3D<IBlockState> blockCache;
+	protected IntCache3D lightCache;
+	protected Cache2D<Biome> biomeCache;
 
-	public SectionRenderCache(World world, SectionPos sectionPos, int radius) {
+	public SectionRenderCache(World world, SectionPos sectionPos) {
 		this.world = world;
 		this.sectionPos = sectionPos;
-		int minX = sectionPos.getBlockX() - radius;
-		int minY = sectionPos.getBlockY() - radius;
-		int minZ = sectionPos.getBlockZ() - radius;
-		int maxX = sectionPos.getBlockX() + 15 + radius;
-		int maxY = sectionPos.getBlockY() + 15 + radius;
-		int maxZ = sectionPos.getBlockZ() + 15 + radius;
-		int minChunkX = minX >> 4;
-		int minChunkY = minY >> 4;
-		int minChunkZ = minZ >> 4;
-		int maxChunkX = maxX >> 4;
-		int maxChunkY = maxY >> 4;
-		int maxChunkZ = maxZ >> 4;
+		int minChunkX = sectionPos.getX() - 1;
+		int minChunkY = sectionPos.getY() - 1;
+		int minChunkZ = sectionPos.getZ() - 1;
+		int maxChunkX = sectionPos.getX() + 1;
+		int maxChunkY = sectionPos.getY() + 1;
+		int maxChunkZ = sectionPos.getZ() + 1;
 		this.chunkCache = new Cache2D<>(minChunkX, minChunkZ, maxChunkX, maxChunkZ, null, Chunk[]::new);
 		this.sectionCache = new Cache3D<>(minChunkX, minChunkY, minChunkZ, maxChunkX, maxChunkY, maxChunkZ, null, ExtendedBlockStorage[]::new);
 		for (int x = minChunkX; x <= maxChunkX; x++) {
@@ -66,9 +63,24 @@ public class SectionRenderCache implements IBlockAccess {
 				}
 			}
 		}
-		this.blockCache = new Cache3D<>(minX, minY, minZ, maxX, maxY, maxZ, Blocks.AIR.getDefaultState(), IBlockState[]::new);
-		this.lightCache = new IntCache3D(minX, minY, minZ, maxX, maxY, maxZ, 0, size -> IntStream.range(0, size).map(i -> -1).toArray());
-		this.biomeCache = new Cache2D<>(minX, minZ, maxX, maxZ, Biomes.PLAINS, Biome[]::new);
+	}
+
+	public void initCaches() {
+		int minX = sectionPos.getBlockX();
+		int minY = sectionPos.getBlockY();
+		int minZ = sectionPos.getBlockZ();
+		int maxX = sectionPos.getBlockX() + 15;
+		int maxY = sectionPos.getBlockY() + 15;
+		int maxZ = sectionPos.getBlockZ() + 15;
+		this.blockCache = new Cache3D<>(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, Blocks.AIR.getDefaultState(), size -> BLOCK.get());
+		this.lightCache = new IntCache3D(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, 0, size -> LIGHT.get());
+		this.biomeCache = new Cache2D<>(minX - 1, minZ - 1, maxX + 1, maxZ + 1, Biomes.PLAINS, size -> BIOME.get());
+	}
+
+	public void freeCaches() {
+		BLOCK.free(blockCache.getData());
+		LIGHT.free(lightCache.getData());
+		BIOME.free(biomeCache.getData());
 	}
 
 	@Nullable

@@ -121,4 +121,8 @@ public class Cache3D<V> {
 		return v;
 	}
 
+	public V[] getData() {
+		return data;
+	}
+
 }

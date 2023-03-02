@@ -62,6 +62,19 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 
 	@Override
 	public RenderChunkTaskResult run() {
+		if (chunkCache instanceof SectionRenderCache) {
+			((SectionRenderCache) chunkCache).initCaches();
+		}
+		try {
+			return compileSection();
+		} finally {
+			if (chunkCache instanceof SectionRenderCache) {
+				((SectionRenderCache) chunkCache).freeCaches();
+			}
+		}
+	}
+
+	public RenderChunkTaskResult compileSection() {
 		if (this.canceled()) {
 			return RenderChunkTaskResult.CANCELLED;
 		}

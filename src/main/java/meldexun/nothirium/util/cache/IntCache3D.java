@@ -85,4 +85,8 @@ public class IntCache3D {
 		return v;
 	}
 
+	public int[] getData() {
+		return data;
+	}
+
 }
