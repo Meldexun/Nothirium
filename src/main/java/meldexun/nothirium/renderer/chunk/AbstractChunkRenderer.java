@@ -24,10 +24,16 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 	private double lastTransparencyResortX;
 	private double lastTransparencyResortY;
 	private double lastTransparencyResortZ;
+	private int renderedChunks;
 	protected final Enum2ObjMap<ChunkRenderPass, List<T>> chunks = new Enum2ObjMap<>(ChunkRenderPass.class, (Supplier<List<T>>) ArrayList::new);
 
 	protected AbstractChunkRenderer() {
 
+	}
+
+	@Override
+	public int renderedChunks() {
+		return renderedChunks;
 	}
 
 	@Override
@@ -43,6 +49,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 		int chunkY = MathUtil.floor(cameraY) >> 4;
 		int chunkZ = MathUtil.floor(cameraZ) >> 4;
 
+		renderedChunks = 0;
 		chunks.forEach(List::clear);
 		T rootRenderChunk = renderChunkProvider.getRenderChunkAt(chunkX, chunkY, chunkZ);
 		rootRenderChunk.visibleDirections = 0x3F;
@@ -115,6 +122,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 		if (renderChunk.isEmpty()) {
 			return;
 		}
+		renderedChunks++;
 		chunks.forEach((pass, list) -> {
 			if (renderChunk.getVBOPart(pass) != null) {
 				list.add(renderChunk);

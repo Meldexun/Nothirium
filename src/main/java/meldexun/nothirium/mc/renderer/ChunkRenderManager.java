@@ -83,6 +83,10 @@ public class ChunkRenderManager {
 		chunkRenderer.setup((IRenderChunkProvider) renderChunkProvider, RenderUtil.getCameraX(), RenderUtil.getCameraY(), RenderUtil.getCameraZ(), RenderUtil.getFrustum(), RenderUtil.getFrame());
 	}
 
+	public static int renderedSections() {
+		return chunkRenderer.renderedChunks();
+	}
+
 	public static int renderedSections(ChunkRenderPass pass) {
 		return chunkRenderer.renderedChunks(pass);
 	}

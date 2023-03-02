@@ -37,6 +37,12 @@ public class MixinRenderGlobal {
 		info.setReturnValue("C: 0/0 (s) D: 0, L: 0, pC: 0, pU: 0, aB: 0");
 	}
 
+	/** {@link RenderGlobal#getRenderedChunks()} */
+	@Inject(method = "getRenderedChunks", cancellable = true, at = @At("HEAD"))
+	public void getRenderedChunks(CallbackInfoReturnable<Integer> info) {
+		info.setReturnValue(ChunkRenderManager.renderedSections());
+	}
+
 	/** {@link RenderGlobal#setupTerrain(Entity, double, ICamera, int, boolean)} */
 	@Inject(method = "setupTerrain", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;startSection(Ljava/lang/String;)V", ordinal = 0))
 	public void setupTerrain(Entity viewEntity, double partialTicks, ICamera camera, int frameCount, boolean playerSpectator, CallbackInfo info) {
