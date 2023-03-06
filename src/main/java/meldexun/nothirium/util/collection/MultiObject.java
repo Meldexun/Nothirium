@@ -52,13 +52,16 @@ public class MultiObject<T> implements IMultiObject<T> {
 
 	@Override
 	public void set(T t) {
-		value = t;
 		values[index] = t;
+		value = t;
 	}
 
 	@Override
 	public void set(int index, T t) {
 		values[index] = t;
+		if (index == this.index) {
+			value = t;
+		}
 	}
 
 	@Override

@@ -105,10 +105,14 @@ public class IntMultiObject implements IMultiObject<Integer> {
 
 	public void set(int t) {
 		values[index] = t;
+		value = t;
 	}
 
 	public void set(int index, int t) {
 		values[index] = t;
+		if (index == this.index) {
+			value = t;
+		}
 	}
 
 	public IntStream streamInt() {
