@@ -3,23 +3,23 @@ package meldexun.nothirium.mc.vertex;
 public interface VertexConsumer {
 
 	default void pos(ExtendedBufferBuilder buffer, double x, double y, double z) {
-		throw new UnsupportedOperationException();
+		// ignore
 	}
 
 	default void color(ExtendedBufferBuilder buffer, int red, int green, int blue, int alpha) {
-		throw new UnsupportedOperationException();
+		// ignore
 	}
 
 	default void tex(ExtendedBufferBuilder buffer, double u, double v) {
-		throw new UnsupportedOperationException();
+		// ignore
 	}
 
 	default void lightmap(ExtendedBufferBuilder buffer, int skyLight, int blockLight) {
-		throw new UnsupportedOperationException();
+		// ignore
 	}
 
 	default void normal(ExtendedBufferBuilder buffer, float x, float y, float z) {
-		throw new UnsupportedOperationException();
+		// ignore
 	}
 
 }
