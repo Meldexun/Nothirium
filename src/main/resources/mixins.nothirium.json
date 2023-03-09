@@ -7,8 +7,6 @@
   "mixins": [
   ],
   "client": [
-    "davincisvessels.MixinMobileChunkRenderer",
-    "davincisvessels.MixinMobileChunkRendererVBORender",
     "optifine.MixinDynamicLight",
     "optifine.MixinEntityRenderer",
     "vertex.MixinBufferBuilder",
