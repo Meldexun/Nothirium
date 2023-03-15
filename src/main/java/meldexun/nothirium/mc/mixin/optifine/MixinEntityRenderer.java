@@ -10,13 +10,13 @@ import net.minecraft.client.renderer.EntityRenderer;
 public class MixinEntityRenderer {
 
 	/** {@link EntityRenderer#setupCameraTransform(float, int)} */
-	@Redirect(method = "setupCameraTransform", require = 0, at = @At(value = "INVOKE", target = "LConfig;isFogFancy()Z"))
+	@Redirect(method = "setupCameraTransform", require = 0, at = @At(value = "INVOKE", target = "LConfig;isFogFancy()Z", remap = false))
 	public boolean isFogFancy(float partialTicks, int pass) {
 		return false;
 	}
 
 	/** {@link EntityRenderer#setupCameraTransform(float, int)} */
-	@Redirect(method = "setupCameraTransform", require = 0, at = @At(value = "INVOKE", target = "LConfig;isFogFast()Z"))
+	@Redirect(method = "setupCameraTransform", require = 0, at = @At(value = "INVOKE", target = "LConfig;isFogFast()Z", remap = false))
 	public boolean isFogFast(float partialTicks, int pass) {
 		return false;
 	}
