@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.Supplier;
 
-import org.lwjgl.opengl.GL11;
-
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.renderer.ChunkRenderManager;
+import meldexun.nothirium.mc.util.FogUtil;
 import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
@@ -55,7 +54,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 		rootRenderChunk.visibleDirections = 0x3F;
 		chunkQueue.add(rootRenderChunk);
 
-		double fogEnd = GL11.glGetFloat(GL11.GL_FOG_END);
+		double fogEndSqr = FogUtil.calculateFogEndSqr();
 		boolean spectator = isSpectator();
 
 		T renderChunk;
@@ -76,7 +75,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 					continue;
 				if (neighbor.lastTimeEnqueued != frame) {
 					neighbor.lastTimeEnqueued = frame;
-					if (neighbor.isFogCulled(cameraX, cameraY, cameraZ, fogEnd) || neighbor.isFrustumCulled(frustum)) {
+					if (neighbor.isFogCulled(cameraX, cameraY, cameraZ, fogEndSqr) || neighbor.isFrustumCulled(frustum)) {
 						neighbor.lastTimeRecorded = frame;
 						continue;
 					}

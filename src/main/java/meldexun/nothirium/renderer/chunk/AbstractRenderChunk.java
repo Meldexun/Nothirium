@@ -136,11 +136,11 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 		this.visibilitySet = visibilitySet;
 	}
 
-	public boolean isFogCulled(double cameraX, double cameraY, double cameraZ, double fogEnd) {
+	public boolean isFogCulled(double cameraX, double cameraY, double cameraZ, double fogEndSqr) {
 		double x = MathUtil.clamp(cameraX, this.x, this.x + 16) - cameraX;
 		double y = MathUtil.clamp(cameraY, this.y, this.y + 16) - cameraY;
 		double z = MathUtil.clamp(cameraZ, this.z, this.z + 16) - cameraZ;
-		return Math.max(x * x + z * z, y * y) > fogEnd * fogEnd;
+		return Math.max(x * x + z * z, y * y) > fogEndSqr;
 	}
 
 	public boolean isFrustumCulled(Frustum frustum) {

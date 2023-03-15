@@ -3,6 +3,7 @@ package meldexun.nothirium.mc.util;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.GLShader;
 import meldexun.renderlib.util.GLUtil;
 import meldexun.renderlib.util.MemoryAccess;
@@ -24,6 +25,8 @@ public class FogUtil {
 	private static final String U_FOGDENSITY = "u_FogDensity";
 	private static final String U_FOGCOLOR = "u_FogColor";
 
+	private static final double FOG_THRESHOLD = -Math.log(0.001D);
+
 	public static void setupFogFromGL(GLShader shader) {
 		if (!GL11.glGetBoolean(GL11.GL_FOG)) {
 			GL20.glUniform1i(shader.getUniform(U_FOGENABLED), GL11.GL_FALSE);
@@ -43,9 +46,22 @@ public class FogUtil {
 				GL20.glUniform1f(shader.getUniform(U_FOGDENSITY), GL11.glGetFloat(GL11.GL_FOG_DENSITY));
 			}
 			MemoryAccess fogColor = GLUtil.getFloat(GL11.GL_FOG_COLOR);
-			GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.getFloat(0), fogColor.getFloat(4),
-					fogColor.getFloat(8), fogColor.getFloat(12));
+			GL20.glUniform4f(shader.getUniform(U_FOGCOLOR), fogColor.getFloat(0), fogColor.getFloat(4), fogColor.getFloat(8), fogColor.getFloat(12));
 		}
+	}
+
+	public static double calculateFogEndSqr() {
+		int fogMode = GL11.glGetInteger(GL11.GL_FOG_MODE);
+		if (fogMode == GL11.GL_LINEAR) {
+			return MathUtil.square(GL11.glGetFloat(GL11.GL_FOG_END));
+		}
+		if (fogMode == GL11.GL_EXP) {
+			return MathUtil.square(FOG_THRESHOLD / GL11.glGetFloat(GL11.GL_FOG_DENSITY));
+		}
+		if (fogMode == GL11.GL_EXP2) {
+			return FOG_THRESHOLD / MathUtil.square(GL11.glGetFloat(GL11.GL_FOG_DENSITY));
+		}
+		return Double.MAX_VALUE;
 	}
 
 }

@@ -30,4 +30,8 @@ public class MathUtil {
 		return x < 0 == y < 0 && x != y * i ? i + 1 : i;
 	}
 
+	public static double square(double d) {
+		return d * d;
+	}
+
 }
