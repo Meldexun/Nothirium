@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.util.Direction;
+import meldexun.nothirium.util.function.IntIntInt2ObjFunction;
+import meldexun.nothirium.util.function.ObjIntIntIntConsumer;
+import meldexun.nothirium.util.function.ObjObjObjObjConsumer;
 import meldexun.nothirium.util.math.MathUtil;
 
 public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<T>> implements IRenderChunkProvider<T> {
@@ -69,61 +72,13 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		int newCameraChunkZ = MathUtil.floor(cameraZ) >> 4;
 
 		if (MathUtil.floorMod(newCameraChunkX, this.gridSizeX) != MathUtil.floorMod(this.cameraChunkX, this.gridSizeX)) {
-			int oldMinChunkX = MathUtil.floorMod(this.cameraChunkX - this.gridSizeX / 2, this.gridSizeX);
-			int oldMaxChunkX = MathUtil.floorMod(this.cameraChunkX + this.gridSizeX / 2, this.gridSizeX);
-			int newMinChunkX = MathUtil.floorMod(newCameraChunkX - this.gridSizeX / 2, this.gridSizeX);
-			int newMaxChunkX = MathUtil.floorMod(newCameraChunkX + this.gridSizeX / 2, this.gridSizeX);
-
-			for (int y = 0; y < this.gridSizeY; y++) {
-				for (int z = 0; z < this.gridSizeZ; z++) {
-					T renderChunk1 = this.getRenderChunkAtUnchecked(oldMinChunkX, y, z);
-					T renderChunk2 = this.getRenderChunkAtUnchecked(oldMaxChunkX, y, z);
-					T renderChunk3 = this.getRenderChunkAtUnchecked(newMinChunkX, y, z);
-					T renderChunk4 = this.getRenderChunkAtUnchecked(newMaxChunkX, y, z);
-					renderChunk1.setNeighbor(Direction.WEST, renderChunk2);
-					renderChunk2.setNeighbor(Direction.EAST, renderChunk1);
-					renderChunk3.setNeighbor(Direction.WEST, null);
-					renderChunk4.setNeighbor(Direction.EAST, null);
-				}
-			}
+			updateNeighborRelations(newCameraChunkX, this.cameraChunkX, this.gridSizeX, this.gridSizeY, this.gridSizeZ, this::getXYZ, this::updateNeighborX);
 		}
 		if (MathUtil.floorMod(newCameraChunkY, this.gridSizeY) != MathUtil.floorMod(this.cameraChunkY, this.gridSizeY)) {
-			int oldMinChunkY = MathUtil.floorMod(this.cameraChunkY - this.gridSizeY / 2, this.gridSizeY);
-			int oldMaxChunkY = MathUtil.floorMod(this.cameraChunkY + this.gridSizeY / 2, this.gridSizeY);
-			int newMinChunkY = MathUtil.floorMod(newCameraChunkY - this.gridSizeY / 2, this.gridSizeY);
-			int newMaxChunkY = MathUtil.floorMod(newCameraChunkY + this.gridSizeY / 2, this.gridSizeY);
-
-			for (int x = 0; x < this.gridSizeX; x++) {
-				for (int z = 0; z < this.gridSizeZ; z++) {
-					T renderChunk1 = this.getRenderChunkAtUnchecked(x, oldMinChunkY, z);
-					T renderChunk2 = this.getRenderChunkAtUnchecked(x, oldMaxChunkY, z);
-					T renderChunk3 = this.getRenderChunkAtUnchecked(x, newMinChunkY, z);
-					T renderChunk4 = this.getRenderChunkAtUnchecked(x, newMaxChunkY, z);
-					renderChunk1.setNeighbor(Direction.DOWN, renderChunk2);
-					renderChunk2.setNeighbor(Direction.UP, renderChunk1);
-					renderChunk3.setNeighbor(Direction.DOWN, null);
-					renderChunk4.setNeighbor(Direction.UP, null);
-				}
-			}
+			updateNeighborRelations(newCameraChunkY, this.cameraChunkY, this.gridSizeY, this.gridSizeX, this.gridSizeZ, this::getYXZ, this::updateNeighborY);
 		}
 		if (MathUtil.floorMod(newCameraChunkZ, this.gridSizeZ) != MathUtil.floorMod(this.cameraChunkZ, this.gridSizeZ)) {
-			int oldMinChunkZ = MathUtil.floorMod(this.cameraChunkZ - this.gridSizeZ / 2, this.gridSizeZ);
-			int oldMaxChunkZ = MathUtil.floorMod(this.cameraChunkZ + this.gridSizeZ / 2, this.gridSizeZ);
-			int newMinChunkZ = MathUtil.floorMod(newCameraChunkZ - this.gridSizeZ / 2, this.gridSizeZ);
-			int newMaxChunkZ = MathUtil.floorMod(newCameraChunkZ + this.gridSizeZ / 2, this.gridSizeZ);
-
-			for (int x = 0; x < this.gridSizeX; x++) {
-				for (int y = 0; y < this.gridSizeY; y++) {
-					T renderChunk1 = this.getRenderChunkAtUnchecked(x, y, oldMinChunkZ);
-					T renderChunk2 = this.getRenderChunkAtUnchecked(x, y, oldMaxChunkZ);
-					T renderChunk3 = this.getRenderChunkAtUnchecked(x, y, newMinChunkZ);
-					T renderChunk4 = this.getRenderChunkAtUnchecked(x, y, newMaxChunkZ);
-					renderChunk1.setNeighbor(Direction.NORTH, renderChunk2);
-					renderChunk2.setNeighbor(Direction.SOUTH, renderChunk1);
-					renderChunk3.setNeighbor(Direction.NORTH, null);
-					renderChunk4.setNeighbor(Direction.SOUTH, null);
-				}
-			}
+			updateNeighborRelations(newCameraChunkZ, this.cameraChunkZ, this.gridSizeZ, this.gridSizeX, this.gridSizeY, this::getZXY, this::updateNeighborZ);
 		}
 
 		int threshold = this.gridSizeX * this.gridSizeY * this.gridSizeZ;
@@ -135,117 +90,136 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		long updZ = (long) this.gridSizeX * this.gridSizeY * offZ;
 		if (updX + updY + updZ >= threshold) {
 			// update all
-			for (int x = newCameraChunkX - this.gridSizeX / 2; x <= newCameraChunkX + this.gridSizeX / 2; x++) {
-				int x1 = MathUtil.floorMod(x, this.gridSizeX);
-
-				for (int z = newCameraChunkZ - this.gridSizeZ / 2; z <= newCameraChunkZ + this.gridSizeZ / 2; z++) {
-					int z1 = MathUtil.floorMod(z, this.gridSizeZ);
-
-					for (int y = newCameraChunkY - this.gridSizeY / 2; y <= newCameraChunkY + this.gridSizeY / 2; y++) {
-						int y1 = MathUtil.floorMod(y, this.gridSizeY);
-
-						T renderChunk = this.getRenderChunkAtUnchecked(x1, y1, z1);
-						renderChunk.setCoords(x << 4, y << 4, z << 4);
-						renderChunk.setLoaded(this.isChunkLoaded(x, y, z));
-					}
-				}
-			}
+			updateRenderChunkPositions(newCameraChunkY, newCameraChunkX, newCameraChunkZ, this.gridSizeY, this.gridSizeX, this.gridSizeZ, this::getYXZ, this::updatePositionYXZ);
 		} else {
 			if (newCameraChunkX != this.cameraChunkX) {
-				int start;
-				int end;
-				int step;
-				if (newCameraChunkX < this.cameraChunkX) {
-					start = newCameraChunkX - this.gridSizeX / 2;
-					end = this.cameraChunkX - this.gridSizeX / 2;
-					step = 1;
-				} else {
-					start = newCameraChunkX + this.gridSizeX / 2;
-					end = this.cameraChunkX + this.gridSizeX / 2;
-					step = -1;
-				}
-
-				for (int x = start; x != end; x += step) {
-					int x1 = MathUtil.floorMod(x, this.gridSizeX);
-
-					for (int z = newCameraChunkZ - this.gridSizeZ / 2; z <= newCameraChunkZ + this.gridSizeZ / 2; z++) {
-						int z1 = MathUtil.floorMod(z, this.gridSizeZ);
-
-						for (int y = newCameraChunkY - this.gridSizeY / 2; y <= newCameraChunkY + this.gridSizeY / 2; y++) {
-							int y1 = MathUtil.floorMod(y, this.gridSizeY);
-
-							T renderChunk = this.getRenderChunkAtUnchecked(x1, y1, z1);
-							renderChunk.setCoords(x << 4, y << 4, z << 4);
-							renderChunk.setLoaded(this.isChunkLoaded(x, y, z));
-						}
-					}
-				}
+				updateRenderChunkPositions(newCameraChunkX, newCameraChunkY, newCameraChunkZ, this.cameraChunkX, this.gridSizeX, this.gridSizeY, this.gridSizeZ, this::getXYZ, this::updatePositionXYZ);
 			}
 			if (newCameraChunkY != this.cameraChunkY) {
-				int start;
-				int end;
-				int step;
-				if (newCameraChunkY < this.cameraChunkY) {
-					start = newCameraChunkY - this.gridSizeY / 2;
-					end = this.cameraChunkY - this.gridSizeY / 2;
-					step = 1;
-				} else {
-					start = newCameraChunkY + this.gridSizeY / 2;
-					end = this.cameraChunkY + this.gridSizeY / 2;
-					step = -1;
-				}
-
-				for (int x = newCameraChunkX - this.gridSizeX / 2; x <= newCameraChunkX + this.gridSizeX / 2; x++) {
-					int x1 = MathUtil.floorMod(x, this.gridSizeX);
-
-					for (int z = newCameraChunkZ - this.gridSizeZ / 2; z <= newCameraChunkZ + this.gridSizeZ / 2; z++) {
-						int z1 = MathUtil.floorMod(z, this.gridSizeZ);
-
-						for (int y = start; y != end; y += step) {
-							int y1 = MathUtil.floorMod(y, this.gridSizeY);
-
-							T renderChunk = this.getRenderChunkAtUnchecked(x1, y1, z1);
-							renderChunk.setCoords(x << 4, y << 4, z << 4);
-							renderChunk.setLoaded(this.isChunkLoaded(x, y, z));
-						}
-					}
-				}
+				updateRenderChunkPositions(newCameraChunkY, newCameraChunkX, newCameraChunkZ, this.cameraChunkY, this.gridSizeY, this.gridSizeX, this.gridSizeZ, this::getYXZ, this::updatePositionYXZ);
 			}
 			if (newCameraChunkZ != this.cameraChunkZ) {
-				int start;
-				int end;
-				int step;
-				if (newCameraChunkZ < this.cameraChunkZ) {
-					start = newCameraChunkZ - this.gridSizeZ / 2;
-					end = this.cameraChunkZ - this.gridSizeZ / 2;
-					step = 1;
-				} else {
-					start = newCameraChunkZ + this.gridSizeZ / 2;
-					end = this.cameraChunkZ + this.gridSizeZ / 2;
-					step = -1;
-				}
-
-				for (int x = newCameraChunkX - this.gridSizeX / 2; x <= newCameraChunkX + this.gridSizeX / 2; x++) {
-					int x1 = MathUtil.floorMod(x, this.gridSizeX);
-
-					for (int z = start; z != end; z += step) {
-						int z1 = MathUtil.floorMod(z, this.gridSizeZ);
-
-						for (int y = newCameraChunkY - this.gridSizeY / 2; y <= newCameraChunkY + this.gridSizeY / 2; y++) {
-							int y1 = MathUtil.floorMod(y, this.gridSizeY);
-
-							T renderChunk = this.getRenderChunkAtUnchecked(x1, y1, z1);
-							renderChunk.setCoords(x << 4, y << 4, z << 4);
-							renderChunk.setLoaded(this.isChunkLoaded(x, y, z));
-						}
-					}
-				}
+				updateRenderChunkPositions(newCameraChunkZ, newCameraChunkX, newCameraChunkY, this.cameraChunkZ, this.gridSizeZ, this.gridSizeX, this.gridSizeY, this::getZXY, this::updatePositionZXY);
 			}
 		}
 
 		this.cameraChunkX = newCameraChunkX;
 		this.cameraChunkY = newCameraChunkY;
 		this.cameraChunkZ = newCameraChunkZ;
+	}
+
+	private static <T extends AbstractRenderChunk<T>> void updateNeighborRelations(int newX, int oldX, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjObjObjObjConsumer<T, T, T, T> neighborUpdateFunc) {
+		int r = sizeX >> 1;
+		int oldMinX = MathUtil.floorMod(oldX - r, sizeX);
+		int oldMaxX = MathUtil.floorMod(oldX + r, sizeX);
+		int newMinX = MathUtil.floorMod(newX - r, sizeX);
+		int newMaxX = MathUtil.floorMod(newX + r, sizeX);
+		for (int y = 0; y < sizeY; y++) {
+			for (int z = 0; z < sizeZ; z++) {
+				T c1 = renderChunkFunc.apply(oldMinX, y, z);
+				T c2 = renderChunkFunc.apply(oldMaxX, y, z);
+				T c3 = renderChunkFunc.apply(newMinX, y, z);
+				T c4 = renderChunkFunc.apply(newMaxX, y, z);
+				neighborUpdateFunc.accept(c1, c2, c3, c4);
+			}
+		}
+	}
+
+	private T getXYZ(int x, int y, int z) {
+		return this.getRenderChunkAtUnchecked(x, y, z);
+	}
+
+	private T getYXZ(int y, int x, int z) {
+		return this.getRenderChunkAtUnchecked(x, y, z);
+	}
+
+	private T getZXY(int z, int x, int y) {
+		return this.getRenderChunkAtUnchecked(x, y, z);
+	}
+
+	private void updateNeighborX(T c1, T c2, T c3, T c4) {
+		c1.setNeighbor(Direction.WEST, c2);
+		c2.setNeighbor(Direction.EAST, c1);
+		c3.setNeighbor(Direction.WEST, null);
+		c4.setNeighbor(Direction.EAST, null);
+	}
+
+	private void updateNeighborY(T c1, T c2, T c3, T c4) {
+		c1.setNeighbor(Direction.DOWN, c2);
+		c2.setNeighbor(Direction.UP, c1);
+		c3.setNeighbor(Direction.DOWN, null);
+		c4.setNeighbor(Direction.UP, null);
+	}
+
+	private void updateNeighborZ(T c1, T c2, T c3, T c4) {
+		c1.setNeighbor(Direction.NORTH, c2);
+		c2.setNeighbor(Direction.SOUTH, c1);
+		c3.setNeighbor(Direction.NORTH, null);
+		c4.setNeighbor(Direction.SOUTH, null);
+	}
+
+	private static <T extends AbstractRenderChunk<T>> void updateRenderChunkPositions(int x0, int x1, int y0, int y1, int z0, int z1, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
+		for (int x = x0; x <= x1; x++) {
+			int ix = MathUtil.floorMod(x, sizeX);
+
+			for (int y = y0; y <= y1; y++) {
+				int iy = MathUtil.floorMod(y, sizeY);
+
+				for (int z = z0; z <= z1; z++) {
+					int iz = MathUtil.floorMod(z, sizeZ);
+
+					positionUpdateFunc.accept(renderChunkFunc.apply(ix, iy, iz), x, y, z);
+				}
+			}
+		}
+	}
+
+	private static <T extends AbstractRenderChunk<T>> void updateRenderChunkPositions(int newX, int newY, int newZ, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
+		int rx = sizeX >> 1;
+		int ry = sizeY >> 1;
+		int rz = sizeZ >> 1;
+		int x0 = newX - rx;
+		int x1 = newX + rx;
+		int y0 = newY - ry;
+		int y1 = newY + ry;
+		int z0 = newZ - rz;
+		int z1 = newZ + rz;
+
+		updateRenderChunkPositions(x0, x1, y0, y1, z0, z1, sizeX, sizeY, sizeZ, renderChunkFunc, positionUpdateFunc);
+	}
+
+	private static <T extends AbstractRenderChunk<T>> void updateRenderChunkPositions(int newX, int newY, int newZ, int oldX, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
+		int rx = sizeX >> 1;
+		int ry = sizeY >> 1;
+		int rz = sizeZ >> 1;
+		int y0 = newY - ry;
+		int y1 = newY + ry;
+		int z0 = newZ - rz;
+		int z1 = newZ + rz;
+
+		if (oldX < newX) {
+			updateRenderChunkPositions(oldX + rx + 1, newX + rx, y0, y1, z0, z1, sizeX, sizeY, sizeZ, renderChunkFunc, positionUpdateFunc);
+		} else {
+			updateRenderChunkPositions(newX - rx, oldX - rx - 1, y0, y1, z0, z1, sizeX, sizeY, sizeZ, renderChunkFunc, positionUpdateFunc);
+		}
+	}
+
+	private void updatePositionXYZ(T renderChunk, int x, int y, int z) {
+		this.updatePosition(renderChunk, x, y, z);
+	}
+
+	private void updatePositionYXZ(T renderChunk, int y, int x, int z) {
+		this.updatePosition(renderChunk, x, y, z);
+	}
+
+	private void updatePositionZXY(T renderChunk, int z, int x, int y) {
+		this.updatePosition(renderChunk, x, y, z);
+	}
+
+	private void updatePosition(T renderChunk, int x, int y, int z) {
+		if (renderChunk.setCoords(x << 4, y << 4, z << 4)) {
+			renderChunk.setLoaded(this.isChunkLoaded(x, y, z));
+		}
 	}
 
 	@Override

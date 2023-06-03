@@ -6,4 +6,15 @@ public enum Axis {
 	Y,
 	Z;
 
+	Direction positive;
+	Direction negative;
+
+	public Direction getPositive() {
+		return positive;
+	}
+
+	public Direction getNegative() {
+		return negative;
+	}
+
 }

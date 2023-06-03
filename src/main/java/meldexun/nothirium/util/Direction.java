@@ -48,6 +48,13 @@ public enum Direction {
 		UP.opposite = DOWN;
 		NORTH.opposite = SOUTH;
 		SOUTH.opposite = NORTH;
+
+		Axis.X.positive = EAST;
+		Axis.X.negative = WEST;
+		Axis.Y.positive = UP;
+		Axis.Y.negative = DOWN;
+		Axis.Z.positive = SOUTH;
+		Axis.Z.negative = NORTH;
 	}
 
 	public static final Direction[] ALL = Direction.values();
