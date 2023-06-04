@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import meldexun.nothirium.mc.renderer.ChunkRenderManager;
-import meldexun.nothirium.mc.renderer.chunk.RenderChunkProvider;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.world.chunk.Chunk;
 
@@ -18,7 +17,7 @@ public class MixinChunkProviderClient {
 	@Inject(method = "loadChunk", at = @At("RETURN"))
 	public void loadChunk(int chunkX, int chunkZ, CallbackInfoReturnable<Chunk> info) {
 		if (ChunkRenderManager.getProvider() != null) {
-			ChunkRenderManager.<RenderChunkProvider>getProvider().setLoaded(chunkX, chunkZ, true);
+			ChunkRenderManager.getProvider().setLoaded(chunkX, chunkZ, true);
 		}
 	}
 
@@ -26,7 +25,7 @@ public class MixinChunkProviderClient {
 	@Inject(method = "unloadChunk", at = @At("RETURN"))
 	public void unloadChunk(int chunkX, int chunkZ, CallbackInfo info) {
 		if (ChunkRenderManager.getProvider() != null) {
-			ChunkRenderManager.<RenderChunkProvider>getProvider().setLoaded(chunkX, chunkZ, false);
+			ChunkRenderManager.getProvider().setLoaded(chunkX, chunkZ, false);
 		}
 	}
 

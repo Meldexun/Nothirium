@@ -231,6 +231,23 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 	}
 
 	@Override
+	public void setLoaded(int chunkX, int chunkY, int chunkZ, boolean isLoaded) {
+		T renderChunk = this.getRenderChunkAt(chunkX, chunkY, chunkZ);
+		if (renderChunk != null) {
+			renderChunk.setLoaded(isLoaded);
+		}
+	}
+
+	@Override
+	public void setLoaded(int chunkX, int chunkZ, boolean isLoaded) {
+		int y0 = this.cameraChunkY - this.gridSizeY / 2;
+		int y1 = this.cameraChunkY + this.gridSizeY / 2;
+		for (int chunkY = y0; chunkY <= y1; chunkY++) {
+			this.setLoaded(chunkX, chunkY, chunkZ, isLoaded);
+		}
+	}
+
+	@Override
 	public T getRenderChunkAt(int chunkX, int chunkY, int chunkZ) {
 		if (chunkX < this.cameraChunkX - this.gridSizeX / 2) {
 			return null;
