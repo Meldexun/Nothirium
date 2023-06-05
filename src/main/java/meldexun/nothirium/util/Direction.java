@@ -4,37 +4,37 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunk;
 
 public enum Direction {
 
-	DOWN(0, Axis.Y) {
+	DOWN(0, Axis.Y, 0, -1, 0) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return renderChunk.getY() >= 256 || cameraY > renderChunk.getY();
 		}
 	},
-	UP(1, Axis.Y) {
+	UP(1, Axis.Y, 0, 1, 0) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return renderChunk.getY() < 0 || cameraY < renderChunk.getY() + 16;
 		}
 	},
-	NORTH(2, Axis.Z) {
+	NORTH(2, Axis.Z, 0, 0, -1) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraZ > renderChunk.getZ();
 		}
 	},
-	SOUTH(3, Axis.Z) {
+	SOUTH(3, Axis.Z, 0, 0, 1) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraZ < renderChunk.getZ() + 16;
 		}
 	},
-	WEST(4, Axis.X) {
+	WEST(4, Axis.X, -1, 0, 0) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraX > renderChunk.getX();
 		}
 	},
-	EAST(5, Axis.X) {
+	EAST(5, Axis.X, 1, 0, 0) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraX < renderChunk.getX() + 16;
@@ -70,10 +70,16 @@ public enum Direction {
 	private final int index;
 	private final Axis axis;
 	private Direction opposite;
+	private final int x;
+	private final int y;
+	private final int z;
 
-	private Direction(int index, Axis axis) {
+	private Direction(int index, Axis axis, int x, int y, int z) {
 		this.index = index;
 		this.axis = axis;
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 
 	public int getIndex() {
@@ -86,6 +92,18 @@ public enum Direction {
 
 	public Axis getAxis() {
 		return axis;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public int getZ() {
+		return z;
 	}
 
 	public static Direction get(int index) {
