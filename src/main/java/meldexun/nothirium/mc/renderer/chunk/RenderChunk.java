@@ -9,7 +9,6 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunk;
-import meldexun.nothirium.util.SectionPos;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -45,16 +44,15 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 		if (this.getY() < 0 || this.getY() >= 256) {
 			return null;
 		}
-		Minecraft mc = Minecraft.getMinecraft();
-		Chunk chunk = mc.world.getChunk(this.getX() >> 4, this.getZ() >> 4);
+		Chunk chunk = mc.world.getChunk(this.getSectionX(), this.getSectionZ());
 		if (chunk.isEmpty()) {
 			return null;
 		}
-		ExtendedBlockStorage blockStorage = chunk.getBlockStorageArray()[this.getY() >> 4];
+		ExtendedBlockStorage blockStorage = chunk.getBlockStorageArray()[this.getSectionY()];
 		if (blockStorage == null || blockStorage.isEmpty()) {
 			return null;
 		}
-		return new RenderChunkTaskCompile(chunkRenderer, taskDispatcher, this, new SectionRenderCache(mc.world, SectionPos.of(this.getX() >> 4, this.getY() >> 4, this.getZ() >> 4)));
+		return new RenderChunkTaskCompile(chunkRenderer, taskDispatcher, this, new SectionRenderCache(mc.world, this.getPos()));
 	}
 
 	@Override
@@ -69,8 +67,8 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 
 	@Override
 	protected boolean canCompile() {
-		for (int x = (this.getX() >> 4) - 1; x <= (this.getX() >> 4) + 1; x++) {
-			for (int z = (this.getZ() >> 4) - 1; z <= (this.getZ() >> 4) + 1; z++) {
+		for (int x = this.getSectionX() - 1; x <= this.getSectionX() + 1; x++) {
+			for (int z = this.getSectionZ() - 1; z <= this.getSectionZ() + 1; z++) {
 				if (!isChunkLoaded(x, z))
 					return false;
 			}

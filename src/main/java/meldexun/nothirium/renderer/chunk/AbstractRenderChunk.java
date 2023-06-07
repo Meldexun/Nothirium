@@ -14,6 +14,7 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkTask;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
 import meldexun.nothirium.util.Direction;
+import meldexun.nothirium.util.SectionPos;
 import meldexun.nothirium.util.VisibilitySet;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
@@ -21,9 +22,7 @@ import meldexun.renderlib.util.Frustum;
 
 public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> implements IRenderChunk<N> {
 
-	private int x;
-	private int y;
-	private int z;
+	private SectionPos pos;
 	@SuppressWarnings("unchecked")
 	private final AbstractRenderChunk<N>[] neighbors = new AbstractRenderChunk[Direction.ALL.length];
 	public int lastTimeEnqueued = -1;
@@ -37,34 +36,20 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	private ByteBuffer translucentVertexData;
 	private int nonemptyVboParts;
 
-	protected AbstractRenderChunk(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	protected AbstractRenderChunk(int sectionX, int sectionY, int sectionZ) {
+		this.pos = SectionPos.of(sectionX, sectionY, sectionZ);
 		this.markDirty();
 	}
 
 	@Override
-	public int getX() {
-		return this.x;
+	public SectionPos getPos() {
+		return this.pos;
 	}
 
 	@Override
-	public int getY() {
-		return this.y;
-	}
-
-	@Override
-	public int getZ() {
-		return this.z;
-	}
-
-	@Override
-	public boolean setCoords(int x, int y, int z) {
-		if (this.x != x || this.y != y || this.z != z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
+	public boolean setCoords(int sectionX, int sectionY, int sectionZ) {
+		if (this.getSectionX() != sectionX || this.getSectionY() != sectionY || this.getSectionZ() != sectionZ) {
+			this.pos = SectionPos.of(sectionX, sectionY, sectionZ);
 			this.releaseBuffers();
 			this.markDirty();
 			return true;
@@ -93,14 +78,14 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	}
 
 	public boolean isFogCulled(double cameraX, double cameraY, double cameraZ, double fogEndSqr) {
-		double x = MathUtil.clamp(cameraX, this.x, this.x + 16) - cameraX;
-		double y = MathUtil.clamp(cameraY, this.y, this.y + 16) - cameraY;
-		double z = MathUtil.clamp(cameraZ, this.z, this.z + 16) - cameraZ;
+		double x = MathUtil.clamp(cameraX, this.getX(), this.getX() + 16) - cameraX;
+		double y = MathUtil.clamp(cameraY, this.getY(), this.getY() + 16) - cameraY;
+		double z = MathUtil.clamp(cameraZ, this.getZ(), this.getZ() + 16) - cameraZ;
 		return Math.max(x * x + z * z, y * y) > fogEndSqr;
 	}
 
 	public boolean isFrustumCulled(Frustum frustum) {
-		return !frustum.isAABBInFrustum(this.x, this.y, this.z, this.x + 16, this.y + 16, this.z + 16);
+		return !frustum.isAABBInFrustum(this.getX(), this.getY(), this.getZ(), this.getX() + 16, this.getY() + 16, this.getZ() + 16);
 	}
 
 	public boolean isVisibleFromAnyOrigin(Direction direction) {

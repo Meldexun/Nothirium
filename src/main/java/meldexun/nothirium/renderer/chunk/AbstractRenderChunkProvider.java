@@ -33,7 +33,7 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		for (int x = 0; x < this.gridSizeX; x++) {
 			for (int z = 0; z < this.gridSizeZ; z++) {
 				for (int y = 0; y < this.gridSizeY; y++) {
-					T renderChunk = this.createRenderChunk(x << 4, y << 4, z << 4);
+					T renderChunk = this.createRenderChunk(x, y, z);
 					this.chunks[this.getChunkIndex(x, y, z)] = renderChunk;
 
 					if (x > 0) {
@@ -202,15 +202,15 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 	}
 
 	private void updatePositionXYZ(T renderChunk, int x, int y, int z) {
-		renderChunk.setCoords(x << 4, y << 4, z << 4);
+		renderChunk.setCoords(x, y, z);
 	}
 
 	private void updatePositionYXZ(T renderChunk, int y, int x, int z) {
-		renderChunk.setCoords(x << 4, y << 4, z << 4);
+		renderChunk.setCoords(x, y, z);
 	}
 
 	private void updatePositionZXY(T renderChunk, int z, int x, int y) {
-		renderChunk.setCoords(x << 4, y << 4, z << 4);
+		renderChunk.setCoords(x, y, z);
 	}
 
 	@Override

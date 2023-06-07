@@ -4,14 +4,35 @@ import javax.annotation.Nullable;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.util.Direction;
+import meldexun.nothirium.util.SectionPos;
 
 public interface IRenderChunk<N extends IRenderChunk<N>> {
 
-	int getX();
+	default int getX() {
+		return getPos().getBlockX();
+	}
 
-	int getY();
+	default int getY() {
+		return getPos().getBlockY();
+	}
 
-	int getZ();
+	default int getZ() {
+		return getPos().getBlockZ();
+	}
+
+	default int getSectionX() {
+		return getPos().getX();
+	}
+
+	default int getSectionY() {
+		return getPos().getY();
+	}
+
+	default int getSectionZ() {
+		return getPos().getZ();
+	}
+
+	SectionPos getPos();
 
 	boolean setCoords(int x, int y, int z);
 
