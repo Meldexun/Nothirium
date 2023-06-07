@@ -21,13 +21,13 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void init(int renderDistance) {
-		this.gridSizeX = renderDistance * 2 + 1;
-		this.gridSizeY = renderDistance * 2 + 1;
-		this.gridSizeZ = renderDistance * 2 + 1;
-		this.cameraChunkX = renderDistance;
-		this.cameraChunkY = renderDistance;
-		this.cameraChunkZ = renderDistance;
+	public void init(int renderDistanceX, int renderDistanceY, int renderDistanceZ) {
+		this.gridSizeX = renderDistanceX * 2 + 1;
+		this.gridSizeY = renderDistanceY * 2 + 1;
+		this.gridSizeZ = renderDistanceZ * 2 + 1;
+		this.cameraChunkX = renderDistanceX;
+		this.cameraChunkY = renderDistanceY;
+		this.cameraChunkZ = renderDistanceZ;
 		this.chunks = new AbstractRenderChunk[this.gridSizeX * this.gridSizeY * this.gridSizeZ];
 
 		for (int x = 0; x < this.gridSizeX; x++) {

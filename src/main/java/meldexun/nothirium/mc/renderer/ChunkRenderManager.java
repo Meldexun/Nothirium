@@ -57,7 +57,7 @@ public class ChunkRenderManager {
 
 		Minecraft mc = Minecraft.getMinecraft();
 		int renderDistance = mc.gameSettings.renderDistanceChunks;
-		renderChunkProvider.init(renderDistance);
+		renderChunkProvider.init(renderDistance, renderDistance, renderDistance);
 		chunkRenderer.init(renderDistance);
 	}
 

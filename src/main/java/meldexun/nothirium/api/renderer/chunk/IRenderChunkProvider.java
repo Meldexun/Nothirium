@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 public interface IRenderChunkProvider<T extends IRenderChunk<T>> {
 
-	void init(int renderDistance);
+	void init(int renderDistanceX, int renderDistanceY, int renderDistanceZ);
 
 	void repositionCamera(double cameraX, double cameraY, double cameraZ);
 
