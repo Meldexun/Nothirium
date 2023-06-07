@@ -13,11 +13,9 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunk;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkTask;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
-import meldexun.nothirium.util.Axis;
 import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VisibilitySet;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
-import meldexun.nothirium.util.function.NullableObjIntIntIntPredicate;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
 
@@ -28,7 +26,6 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	private int z;
 	@SuppressWarnings("unchecked")
 	private final AbstractRenderChunk<N>[] neighbors = new AbstractRenderChunk[Direction.ALL.length];
-	private boolean isLoaded;
 	public int lastTimeEnqueued = -1;
 	public int lastTimeRecorded = -1;
 	private VisibilitySet visibilitySet = new VisibilitySet();
@@ -85,14 +82,6 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 	@Override
 	public void setNeighbor(Direction direction, @Nullable N neighbor) {
 		this.neighbors[direction.ordinal()] = neighbor;
-	}
-
-	public boolean isLoaded() {
-		return this.isLoaded;
-	}
-
-	public void setLoaded(boolean isLoaded) {
-		this.isLoaded = isLoaded;
 	}
 
 	public VisibilitySet getVisibility() {
@@ -174,71 +163,10 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 		Arrays.stream(ChunkRenderPass.ALL).forEach(pass -> this.setVBOPart(pass, null));
 	}
 
-	protected boolean canCompile() {
-		return this.isDirty() && this.isLoaded() && this.allNeighborsLoaded();
-	}
-
-	protected boolean allNeighborsLoaded() {
-		return neighborsMatch(this, this.getX() >> 4, this.getY() >> 4, this.getZ() >> 4, Axis.X, Axis.Z, Axis.Y, this::isNeighborLoaded);
-	}
-
-	protected abstract boolean isNeighborLoaded(@Nullable N neighbor, int chunkX, int chunkY, int chunkZ);
-
-	public static <N extends AbstractRenderChunk<N>> boolean neighborsMatch(@Nullable AbstractRenderChunk<N> renderChunk, int chunkX, int chunkY, int chunkZ, Axis axis, NullableObjIntIntIntPredicate<N> predicate) {
-		return neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis.getNegative(), predicate)
-				&& neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis.getPositive(), predicate);
-	}
-
-	public static <N extends AbstractRenderChunk<N>> boolean neighborsMatch(@Nullable AbstractRenderChunk<N> renderChunk, int chunkX, int chunkY, int chunkZ, Axis axis, Axis axis1, NullableObjIntIntIntPredicate<N> predicate) {
-		return neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis, predicate)
-				&& neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis1.getNegative(), axis, predicate)
-				&& neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis1.getPositive(), axis, predicate);
-	}
-
-	public static <N extends AbstractRenderChunk<N>> boolean neighborsMatch(@Nullable AbstractRenderChunk<N> renderChunk, int chunkX, int chunkY, int chunkZ, Axis axis, Axis axis1, Axis axis2, NullableObjIntIntIntPredicate<N> predicate) {
-		return neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis, axis1, predicate)
-				&& neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis2.getNegative(), axis, axis1, predicate)
-				&& neighborsMatch(renderChunk, chunkX, chunkY, chunkZ, axis2.getPositive(), axis, axis1, predicate);
-	}
-
-	public static <N extends AbstractRenderChunk<N>> boolean neighborsMatch(@Nullable AbstractRenderChunk<N> renderChunk, int chunkX, int chunkY, int chunkZ, Direction direction, NullableObjIntIntIntPredicate<N> predicate) {
-		N neighbor = renderChunk != null ? renderChunk.getNeighbor(direction) : null;
-		int x1 = chunkX + direction.getX();
-		int y1 = chunkY + direction.getY();
-		int z1 = chunkZ + direction.getZ();
-		if (!predicate.test(neighbor, x1, y1, z1))
-			return false;
-		return true;
-	}
-
-	public static <N extends AbstractRenderChunk<N>> boolean neighborsMatch(@Nullable AbstractRenderChunk<N> renderChunk, int chunkX, int chunkY, int chunkZ, Direction direction, Axis axis1, NullableObjIntIntIntPredicate<N> predicate) {
-		N neighbor = renderChunk != null ? renderChunk.getNeighbor(direction) : null;
-		int x1 = chunkX + direction.getX();
-		int y1 = chunkY + direction.getY();
-		int z1 = chunkZ + direction.getZ();
-		if (!predicate.test(neighbor, x1, y1, z1))
-			return false;
-		if (!neighborsMatch(neighbor, x1, y1, z1, axis1, predicate))
-			return false;
-		return true;
-	}
-
-	public static <N extends AbstractRenderChunk<N>> boolean neighborsMatch(@Nullable AbstractRenderChunk<N> renderChunk, int chunkX, int chunkY, int chunkZ, Direction direction, Axis axis1, Axis axis2, NullableObjIntIntIntPredicate<N> predicate) {
-		N neighbor = renderChunk != null ? renderChunk.getNeighbor(direction) : null;
-		int x1 = chunkX + direction.getX();
-		int y1 = chunkY + direction.getY();
-		int z1 = chunkZ + direction.getZ();
-		if (!predicate.test(neighbor, x1, y1, z1))
-			return false;
-		if (!neighborsMatch(neighbor, x1, y1, z1, axis1, predicate))
-			return false;
-		if (!neighborsMatch(neighbor, x1, y1, z1, axis2, axis1, predicate))
-			return false;
-		return true;
-	}
+	protected abstract boolean canCompile();
 
 	public void compileAsync(IChunkRenderer<?> chunkRenderer, IRenderChunkDispatcher taskDispatcher) {
-		if (!this.canCompile()) {
+		if (!this.isDirty() || !this.canCompile()) {
 			return;
 		}
 		this.cancelTask();

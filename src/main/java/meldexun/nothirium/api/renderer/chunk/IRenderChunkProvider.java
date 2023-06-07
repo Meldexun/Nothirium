@@ -10,10 +10,6 @@ public interface IRenderChunkProvider<T extends IRenderChunk<T>> {
 
 	void setDirty(int chunkX, int chunkY, int chunkZ);
 
-	void setLoaded(int chunkX, int chunkY, int chunkZ, boolean isLoaded);
-
-	void setLoaded(int chunkX, int chunkZ, boolean isLoaded);
-
 	@Nullable
 	T getRenderChunkAt(int chunkX, int chunkY, int chunkZ);
 

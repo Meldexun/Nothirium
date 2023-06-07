@@ -9,7 +9,6 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunk;
-import meldexun.nothirium.util.Axis;
 import meldexun.nothirium.util.SectionPos;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
@@ -69,15 +68,17 @@ public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
 	}
 
 	@Override
-	protected boolean allNeighborsLoaded() {
-		return neighborsMatch(this, this.getX() >> 4, this.getY() >> 4, this.getZ() >> 4, Axis.X, Axis.Z, this::isNeighborLoaded);
+	protected boolean canCompile() {
+		for (int x = (this.getX() >> 4) - 1; x <= (this.getX() >> 4) + 1; x++) {
+			for (int z = (this.getZ() >> 4) - 1; z <= (this.getZ() >> 4) + 1; z++) {
+				if (!isChunkLoaded(x, z))
+					return false;
+			}
+		}
+		return true;
 	}
 
-	@Override
-	protected boolean isNeighborLoaded(@Nullable RenderChunk neighbor, int chunkX, int chunkY, int chunkZ) {
-		if (neighbor != null) {
-			return neighbor.isLoaded();
-		}
+	private boolean isChunkLoaded(int chunkX, int chunkZ) {
 		World world = Minecraft.getMinecraft().world;
 		return world != null && world.getChunkProvider().getLoadedChunk(chunkX, chunkZ) != null;
 	}

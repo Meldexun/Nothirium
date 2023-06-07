@@ -34,7 +34,6 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 			for (int z = 0; z < this.gridSizeZ; z++) {
 				for (int y = 0; y < this.gridSizeY; y++) {
 					T renderChunk = this.createRenderChunk(x << 4, y << 4, z << 4);
-					renderChunk.setLoaded(this.isChunkLoaded(x, y, z));
 					this.chunks[this.getChunkIndex(x, y, z)] = renderChunk;
 
 					if (x > 0) {
@@ -60,8 +59,6 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 	private int getChunkIndex(int chunkX, int chunkY, int chunkZ) {
 		return (chunkZ * this.gridSizeY + chunkY) * this.gridSizeX + chunkX;
 	}
-
-	protected abstract boolean isChunkLoaded(int chunkX, int chunkY, int chunkZ);
 
 	protected abstract T createRenderChunk(int x, int y, int z);
 
@@ -205,21 +202,15 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 	}
 
 	private void updatePositionXYZ(T renderChunk, int x, int y, int z) {
-		this.updatePosition(renderChunk, x, y, z);
+		renderChunk.setCoords(x << 4, y << 4, z << 4);
 	}
 
 	private void updatePositionYXZ(T renderChunk, int y, int x, int z) {
-		this.updatePosition(renderChunk, x, y, z);
+		renderChunk.setCoords(x << 4, y << 4, z << 4);
 	}
 
 	private void updatePositionZXY(T renderChunk, int z, int x, int y) {
-		this.updatePosition(renderChunk, x, y, z);
-	}
-
-	private void updatePosition(T renderChunk, int x, int y, int z) {
-		if (renderChunk.setCoords(x << 4, y << 4, z << 4)) {
-			renderChunk.setLoaded(this.isChunkLoaded(x, y, z));
-		}
+		renderChunk.setCoords(x << 4, y << 4, z << 4);
 	}
 
 	@Override
@@ -227,23 +218,6 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		T renderChunk = this.getRenderChunkAt(chunkX, chunkY, chunkZ);
 		if (renderChunk != null) {
 			renderChunk.markDirty();
-		}
-	}
-
-	@Override
-	public void setLoaded(int chunkX, int chunkY, int chunkZ, boolean isLoaded) {
-		T renderChunk = this.getRenderChunkAt(chunkX, chunkY, chunkZ);
-		if (renderChunk != null) {
-			renderChunk.setLoaded(isLoaded);
-		}
-	}
-
-	@Override
-	public void setLoaded(int chunkX, int chunkZ, boolean isLoaded) {
-		int y0 = this.cameraChunkY - this.gridSizeY / 2;
-		int y1 = this.cameraChunkY + this.gridSizeY / 2;
-		for (int chunkY = y0; chunkY <= y1; chunkY++) {
-			this.setLoaded(chunkX, chunkY, chunkZ, isLoaded);
 		}
 	}
 
