@@ -14,7 +14,6 @@
     "vertex.MixinVertexFormatElement",
     "MixinBetterBiomeBlend",
     "MixinBlock",
-    "MixinChunkProviderClient",
     "MixinGuiOverlayDebug",
     "MixinRenderGlobal"
   ],
