@@ -18,6 +18,7 @@ import meldexun.nothirium.util.VisibilitySet;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
+import meldexun.renderlib.util.memory.UnsafeByteBuffer;
 
 public abstract class AbstractRenderChunk implements IRenderChunk {
 
@@ -31,7 +32,7 @@ public abstract class AbstractRenderChunk implements IRenderChunk {
 	private IRenderChunkTask lastCompileTask;
 	private CompletableFuture<RenderChunkTaskResult> lastCompileTaskResult;
 	private final Enum2ObjMap<ChunkRenderPass, IVBOPart> vboParts = new Enum2ObjMap<>(ChunkRenderPass.class);
-	private ByteBuffer translucentVertexData;
+	private UnsafeByteBuffer translucentVertexData;
 	private int nonemptyVboParts;
 
 	protected AbstractRenderChunk(int sectionX, int sectionY, int sectionZ) {
@@ -121,7 +122,7 @@ public abstract class AbstractRenderChunk implements IRenderChunk {
 			nonemptyVboParts &= ~(1 << pass.ordinal());
 		}
 		if (pass == ChunkRenderPass.TRANSLUCENT) {
-			this.translucentVertexData = null;
+			this.setTranslucentVertexData(null);
 		}
 	}
 
@@ -141,6 +142,7 @@ public abstract class AbstractRenderChunk implements IRenderChunk {
 	public void releaseBuffers() {
 		this.cancelTask();
 		Arrays.stream(ChunkRenderPass.ALL).forEach(pass -> this.setVBOPart(pass, null));
+		this.setTranslucentVertexData(null);
 	}
 
 	protected abstract boolean canCompile();
@@ -178,11 +180,13 @@ public abstract class AbstractRenderChunk implements IRenderChunk {
 	protected abstract AbstractRenderChunkTask<?> createSortTranslucentTask(IChunkRenderer<?> chunkRenderer, IRenderChunkDispatcher taskDispatcher);
 
 	@Nullable
-	public ByteBuffer getTranslucentVertexData() {
+	public UnsafeByteBuffer getTranslucentVertexData() {
 		return translucentVertexData;
 	}
 
-	public void setTranslucentVertexData(@Nullable ByteBuffer translucentVertexData) {
+	public void setTranslucentVertexData(@Nullable UnsafeByteBuffer translucentVertexData) {
+		if (this.translucentVertexData != null)
+			this.translucentVertexData.close();
 		this.translucentVertexData = translucentVertexData;
 	}
 

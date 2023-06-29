@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL20;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.GLShader;
 import meldexun.renderlib.util.GLUtil;
-import meldexun.renderlib.util.MemoryAccess;
+import meldexun.renderlib.util.memory.MemoryAccess;
 
 public class FogUtil {
 

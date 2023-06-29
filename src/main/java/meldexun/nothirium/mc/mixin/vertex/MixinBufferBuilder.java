@@ -14,7 +14,8 @@ import meldexun.matrixutil.MemoryUtil;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkTaskSortTranslucent;
 import meldexun.nothirium.mc.vertex.ExtendedBufferBuilder;
 import meldexun.nothirium.mc.vertex.ExtendedVertexFormatElement;
-import meldexun.renderlib.util.UnsafeBuffer;
+import meldexun.nothirium.util.VertexSortUtil;
+import meldexun.renderlib.util.memory.NIOBufferUtil;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
@@ -58,7 +59,7 @@ public abstract class MixinBufferBuilder implements ExtendedBufferBuilder {
 
 	@Overwrite
 	public void sortVertexData(float cameraX, float cameraY, float cameraZ) {
-		RenderChunkTaskSortTranslucent.sortVertexData(new UnsafeBuffer<>(byteBuffer), vertexCount / 4,
+		RenderChunkTaskSortTranslucent.sortVertexData(NIOBufferUtil.asMemoryAccess(byteBuffer), vertexCount / 4,
 				(float) (xOffset - cameraX), (float) (yOffset - cameraY), (float) (zOffset - cameraZ));
 	}
 

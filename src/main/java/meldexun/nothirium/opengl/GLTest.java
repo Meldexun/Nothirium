@@ -1,7 +1,5 @@
 package meldexun.nothirium.opengl;
 
-import java.nio.ByteBuffer;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL31;
@@ -9,8 +7,8 @@ import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL43;
 
 import meldexun.nothirium.mc.Nothirium;
-import meldexun.renderlib.util.BufferUtil;
 import meldexun.renderlib.util.GLUtil;
+import meldexun.renderlib.util.memory.NIOBufferUtil;
 import net.minecraft.client.renderer.GlStateManager;
 
 public class GLTest {
@@ -23,8 +21,9 @@ public class GLTest {
 		GlStateManager.disableAlpha();
 		GlStateManager.disableDepth();
 
-		ByteBuffer data = BufferUtil.buffer(-0.5F, -0.5F, 0.0F, -0.5F, 0.0F, 0.5F, -0.5F, 0.5F);
-		GL11.glVertexPointer(2, GL11.GL_FLOAT, 0, data);
+		NIOBufferUtil.tempByteBuffer(new float[] {
+				-0.5F, -0.5F, 0.0F, -0.5F, 0.0F, 0.5F, -0.5F, 0.5F
+		}, buffer -> GL11.glVertexPointer(2, GL11.GL_FLOAT, 0, buffer));
 		GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
 
 		int expected = samplesPassed(() -> GL11.glDrawArrays(GL11.GL_QUADS, 0, 4));
@@ -35,12 +34,16 @@ public class GLTest {
 		Nothirium.LOGGER.info("Test glDrawArraysInstanced: {}", glDrawArraysInstanced);
 
 		glDrawArraysIndirect = GLUtil.CAPS.OpenGL40 && samplesPassed(() -> {
-			GL40.glDrawArraysIndirect(GL11.GL_QUADS, BufferUtil.buffer(4, 1, 0, 0));
+			NIOBufferUtil.tempIntBuffer(new int[] {
+					4, 1, 0, 0
+			}, buffer -> GL40.glDrawArraysIndirect(GL11.GL_QUADS, buffer));
 		}) == expected;
 		Nothirium.LOGGER.info("Test glDrawArraysIndirect: {}", glDrawArraysIndirect);
 
 		glMultiDrawArraysIndirect = GLUtil.CAPS.OpenGL43 && samplesPassed(() -> {
-			GL43.glMultiDrawArraysIndirect(GL11.GL_QUADS, BufferUtil.buffer(4, 1, 0, 0), 1, 0);
+			NIOBufferUtil.tempIntBuffer(new int[] {
+					4, 1, 0, 0
+			}, buffer -> GL43.glMultiDrawArraysIndirect(GL11.GL_QUADS, buffer, 1, 0));
 		}) == expected;
 		Nothirium.LOGGER.info("Test glMultiDrawArraysIndirect: {}", glMultiDrawArraysIndirect);
 

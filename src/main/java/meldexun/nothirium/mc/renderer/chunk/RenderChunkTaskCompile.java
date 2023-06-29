@@ -20,8 +20,7 @@ import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
 import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VisibilityGraph;
 import meldexun.nothirium.util.VisibilitySet;
-import meldexun.renderlib.util.BufferUtil;
-import meldexun.renderlib.util.UnsafeBuffer;
+import meldexun.renderlib.util.memory.NIOBufferUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -123,7 +122,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 				if (entity != null) {
 					BufferBuilder bufferBuilder = bufferBuilderPack
 							.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
-					RenderChunkTaskSortTranslucent.sortVertexData(new UnsafeBuffer<>(bufferBuilder.getByteBuffer()),
+					RenderChunkTaskSortTranslucent.sortVertexData(NIOBufferUtil.asMemoryAccess(bufferBuilder.getByteBuffer()),
 							bufferBuilder.getVertexCount() / 4, renderChunk, entity.getPositionEyes(1.0F));
 				}
 			}
@@ -162,7 +161,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 							} else {
 								this.renderChunk.setVBOPart(pass, this.chunkRenderer.buffer(pass, bufferBuilder.getByteBuffer()));
 								if (pass == ChunkRenderPass.TRANSLUCENT) {
-									this.renderChunk.setTranslucentVertexData(BufferUtil.copy(bufferBuilder.getByteBuffer()));
+									this.renderChunk.setTranslucentVertexData(NIOBufferUtil.copyAsUnsafeBuffer(bufferBuilder.getByteBuffer()));
 								}
 							}
 						}

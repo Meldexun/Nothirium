@@ -1,6 +1,5 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.nio.ByteBuffer;
 import java.util.BitSet;
 import java.util.stream.IntStream;
 
@@ -13,9 +12,9 @@ import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
-import meldexun.renderlib.util.BufferUtil;
-import meldexun.renderlib.util.MemoryAccess;
-import meldexun.renderlib.util.UnsafeBuffer;
+import meldexun.renderlib.util.memory.MemoryAccess;
+import meldexun.renderlib.util.memory.UnsafeBufferUtil;
+import meldexun.renderlib.util.memory.UnsafeByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -24,13 +23,13 @@ import net.minecraft.util.math.Vec3d;
 public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<RenderChunk> {
 
 	private final IVBOPart vboPart;
-	private final UnsafeBuffer<ByteBuffer> vertexData;
+	private final UnsafeByteBuffer vertexData;
 
 	public RenderChunkTaskSortTranslucent(IChunkRenderer<?> chunkRenderer, IRenderChunkDispatcher taskDispatcher,
-			RenderChunk renderChunk, IVBOPart vboPart, ByteBuffer vertexData) {
+			RenderChunk renderChunk, IVBOPart vboPart, UnsafeByteBuffer vertexData) {
 		super(chunkRenderer, taskDispatcher, renderChunk);
 		this.vboPart = vboPart;
-		this.vertexData = new UnsafeBuffer<>(vertexData);
+		this.vertexData = vertexData;
 	}
 
 	@Override
@@ -70,26 +69,27 @@ public class RenderChunkTaskSortTranslucent extends AbstractRenderChunkTask<Rend
 		int[] quadOrder = createQuadOrder(vertexData, quadCount, dx, dy, dz);
 
 		int bytesPerQuad = DefaultVertexFormats.BLOCK.getSize() * 4;
-		UnsafeBuffer<ByteBuffer> tempBuffer = new UnsafeBuffer<>(BufferUtil.allocate(bytesPerQuad));
-		BitSet sortedQuads = new BitSet();
-		for (int i1 = sortedQuads.nextClearBit(0); i1 < quadOrder.length; i1 = sortedQuads.nextClearBit(i1 + 1)) {
-			int j1 = quadOrder[i1];
+		UnsafeBufferUtil.tempBuffer(bytesPerQuad, tempBuffer -> {
+			BitSet sortedQuads = new BitSet();
+			for (int i1 = sortedQuads.nextClearBit(0); i1 < quadOrder.length; i1 = sortedQuads.nextClearBit(i1 + 1)) {
+				int j1 = quadOrder[i1];
 
-			if (j1 != i1) {
-				MemoryAccess.copyMemory(vertexData, j1 * bytesPerQuad, tempBuffer, 0L, bytesPerQuad);
-				int k1 = j1;
+				if (j1 != i1) {
+					MemoryAccess.copyMemory(vertexData, j1 * bytesPerQuad, tempBuffer, 0L, bytesPerQuad);
+					int k1 = j1;
 
-				for (int l1 = quadOrder[j1]; k1 != i1; l1 = quadOrder[l1]) {
-					MemoryAccess.copyMemory(vertexData, l1 * bytesPerQuad, vertexData, k1 * bytesPerQuad, bytesPerQuad);
-					sortedQuads.set(k1);
-					k1 = l1;
+					for (int l1 = quadOrder[j1]; k1 != i1; l1 = quadOrder[l1]) {
+						MemoryAccess.copyMemory(vertexData, l1 * bytesPerQuad, vertexData, k1 * bytesPerQuad, bytesPerQuad);
+						sortedQuads.set(k1);
+						k1 = l1;
+					}
+
+					MemoryAccess.copyMemory(tempBuffer, 0L, vertexData, i1 * bytesPerQuad, bytesPerQuad);
 				}
 
-				MemoryAccess.copyMemory(tempBuffer, 0L, vertexData, i1 * bytesPerQuad, bytesPerQuad);
+				sortedQuads.set(i1);
 			}
-
-			sortedQuads.set(i1);
-		}
+		});
 	}
 
 	@SuppressWarnings("serial")
