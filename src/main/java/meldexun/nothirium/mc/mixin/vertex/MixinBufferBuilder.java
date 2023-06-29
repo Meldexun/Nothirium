@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import meldexun.matrixutil.MemoryUtil;
-import meldexun.nothirium.mc.renderer.chunk.RenderChunkTaskSortTranslucent;
 import meldexun.nothirium.mc.vertex.ExtendedBufferBuilder;
 import meldexun.nothirium.mc.vertex.ExtendedVertexFormatElement;
 import meldexun.nothirium.util.VertexSortUtil;
@@ -59,7 +58,7 @@ public abstract class MixinBufferBuilder implements ExtendedBufferBuilder {
 
 	@Overwrite
 	public void sortVertexData(float cameraX, float cameraY, float cameraZ) {
-		RenderChunkTaskSortTranslucent.sortVertexData(NIOBufferUtil.asMemoryAccess(byteBuffer), vertexCount / 4,
+		VertexSortUtil.sortVertexData(NIOBufferUtil.asMemoryAccess(byteBuffer), vertexCount, vertexFormat.getSize(), 4,
 				(float) (xOffset - cameraX), (float) (yOffset - cameraY), (float) (zOffset - cameraZ));
 	}
 

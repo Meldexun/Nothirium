@@ -18,6 +18,7 @@ import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
 import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
 import meldexun.nothirium.util.Direction;
+import meldexun.nothirium.util.VertexSortUtil;
 import meldexun.nothirium.util.VisibilityGraph;
 import meldexun.nothirium.util.VisibilitySet;
 import meldexun.renderlib.util.memory.NIOBufferUtil;
@@ -30,6 +31,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 
@@ -122,8 +124,9 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 				if (entity != null) {
 					BufferBuilder bufferBuilder = bufferBuilderPack
 							.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
-					RenderChunkTaskSortTranslucent.sortVertexData(NIOBufferUtil.asMemoryAccess(bufferBuilder.getByteBuffer()),
-							bufferBuilder.getVertexCount() / 4, renderChunk, entity.getPositionEyes(1.0F));
+					Vec3d camera = entity.getPositionEyes(1.0F);
+					VertexSortUtil.sortVertexData(NIOBufferUtil.asMemoryAccess(bufferBuilder.getByteBuffer()), bufferBuilder.getVertexCount(), bufferBuilder.getVertexFormat().getSize(), 4,
+							(float) (renderChunk.getX() - camera.x), (float) (renderChunk.getY() - camera.y), (float) (renderChunk.getZ() - camera.z));
 				}
 			}
 
