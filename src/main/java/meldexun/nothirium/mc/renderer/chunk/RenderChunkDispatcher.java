@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
+import meldexun.nothirium.mc.Nothirium;
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 
@@ -71,16 +72,18 @@ public class RenderChunkDispatcher implements IRenderChunkDispatcher {
 	@Override
 	public void dispose() {
 		executor.shutdown();
+		this.update();
 		try {
-			if (!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+			if (!executor.awaitTermination(10_000, TimeUnit.MILLISECONDS)) {
 				executor.shutdownNow();
-				if (!executor.awaitTermination(1000, TimeUnit.MILLISECONDS))
-					System.err.println("Pool did not terminate");
+				if (!executor.awaitTermination(10_000, TimeUnit.MILLISECONDS))
+					Nothirium.LOGGER.error("ChunkRenderDispatcher did not terminate!");
 			}
 		} catch (InterruptedException e) {
 			executor.shutdownNow();
 			Thread.currentThread().interrupt();
 		}
+		this.update();
 	}
 
 }

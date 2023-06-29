@@ -75,110 +75,105 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 		}
 	}
 
-	public RenderChunkTaskResult compileSection() {
-		if (this.canceled()) {
-			return RenderChunkTaskResult.CANCELLED;
-		}
+	private RenderChunkTaskResult compileSection() {
+		RegionRenderCacheBuilder bufferBuilderPack = null;
+		boolean freeBufferBuilderPack = true;
 
-		RegionRenderCacheBuilder bufferBuilderPack;
 		try {
 			bufferBuilderPack = BUFFER_QUEUE.take();
+			freeBufferBuilderPack = compileSection(bufferBuilderPack) != RenderChunkTaskResult.SUCCESSFUL;
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			return RenderChunkTaskResult.CANCELLED;
+		} finally {
+			if (bufferBuilderPack != null && freeBufferBuilderPack) {
+				freeBuffer(bufferBuilderPack);
+			}
 		}
 
+		return this.canceled() ? RenderChunkTaskResult.CANCELLED : RenderChunkTaskResult.SUCCESSFUL;
+	}
+
+	private RenderChunkTaskResult compileSection(RegionRenderCacheBuilder bufferBuilderPack) {
 		if (this.canceled()) {
-			freeBuffer(bufferBuilderPack);
 			return RenderChunkTaskResult.CANCELLED;
 		}
 
-		try {
-			Minecraft mc = Minecraft.getMinecraft();
-			MutableBlockPos pos = new MutableBlockPos();
-			VisibilityGraph visibilityGraph = new VisibilityGraph();
+		Minecraft mc = Minecraft.getMinecraft();
+		MutableBlockPos pos = new MutableBlockPos();
+		VisibilityGraph visibilityGraph = new VisibilityGraph();
 
-			for (int x = 0; x < 16; x++) {
-				for (int y = 0; y < 16; y++) {
-					for (int z = 0; z < 16; z++) {
-						pos.setPos(this.renderChunk.getX() + x, this.renderChunk.getY() + y, this.renderChunk.getZ() + z);
-						IBlockState blockState = this.chunkCache.getBlockState(pos);
-						renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
+		for (int x = 0; x < 16; x++) {
+			for (int y = 0; y < 16; y++) {
+				for (int z = 0; z < 16; z++) {
+					pos.setPos(this.renderChunk.getX() + x, this.renderChunk.getY() + y, this.renderChunk.getZ() + z);
+					IBlockState blockState = this.chunkCache.getBlockState(pos);
+					renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
 
-						if (Nothirium.isFluidloggedAPIInstalled) {
-							FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState -> renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
-						}
+					if (Nothirium.isFluidloggedAPIInstalled) {
+						FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState -> renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
 					}
 				}
-
-				if (this.canceled()) {
-					freeBuffer(bufferBuilderPack);
-					return RenderChunkTaskResult.CANCELLED;
-				}
-			}
-
-			VisibilitySet visibilitySet = visibilityGraph.compute();
-
-			if (bufferBuilderPack.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT).isDrawing) {
-				Entity entity = mc.getRenderViewEntity();
-				if (entity != null) {
-					BufferBuilder bufferBuilder = bufferBuilderPack
-							.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
-					Vec3d camera = entity.getPositionEyes(1.0F);
-					VertexSortUtil.sortVertexData(NIOBufferUtil.asMemoryAccess(bufferBuilder.getByteBuffer()), bufferBuilder.getVertexCount(), bufferBuilder.getVertexFormat().getSize(), 4,
-							(float) (renderChunk.getX() - camera.x), (float) (renderChunk.getY() - camera.y), (float) (renderChunk.getZ() - camera.z));
-				}
 			}
 
 			if (this.canceled()) {
-				freeBuffer(bufferBuilderPack);
 				return RenderChunkTaskResult.CANCELLED;
 			}
+		}
 
-			BufferBuilder[] finishedBufferBuilders = Arrays.stream(BlockRenderLayerUtil.ALL)
-					.map(bufferBuilderPack::getWorldRendererByLayer)
-					.map(bufferBuilder -> {
-						if (!bufferBuilder.isDrawing) {
-							return null;
-						}
-						bufferBuilder.finishDrawing();
-						if (bufferBuilder.getVertexCount() == 0) {
-							return null;
-						}
-						return bufferBuilder;
-					}).toArray(BufferBuilder[]::new);
+		VisibilitySet visibilitySet = visibilityGraph.compute();
 
-			if (this.canceled()) {
-				freeBuffer(bufferBuilderPack);
-				return RenderChunkTaskResult.CANCELLED;
+		if (bufferBuilderPack.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT).isDrawing) {
+			Entity entity = mc.getRenderViewEntity();
+			if (entity != null) {
+				BufferBuilder bufferBuilder = bufferBuilderPack.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
+				Vec3d camera = entity.getPositionEyes(1.0F);
+				VertexSortUtil.sortVertexData(NIOBufferUtil.asMemoryAccess(bufferBuilder.getByteBuffer()), bufferBuilder.getVertexCount(), bufferBuilder.getVertexFormat().getSize(), 4,
+						(float) (renderChunk.getX() - camera.x), (float) (renderChunk.getY() - camera.y), (float) (renderChunk.getZ() - camera.z));
 			}
+		}
 
-			this.taskDispatcher.runOnRenderThread(() -> {
-				try {
-					if (!this.canceled()) {
-						this.renderChunk.setVisibility(visibilitySet);
-						for (ChunkRenderPass pass : ChunkRenderPass.ALL) {
-							BufferBuilder bufferBuilder = finishedBufferBuilders[pass.ordinal()];
-							if (bufferBuilder == null) {
-								this.renderChunk.setVBOPart(pass, null);
-							} else {
-								this.renderChunk.setVBOPart(pass, this.chunkRenderer.buffer(pass, bufferBuilder.getByteBuffer()));
-								if (pass == ChunkRenderPass.TRANSLUCENT) {
-									this.renderChunk.setTranslucentVertexData(NIOBufferUtil.copyAsUnsafeBuffer(bufferBuilder.getByteBuffer()));
-								}
+		if (this.canceled()) {
+			return RenderChunkTaskResult.CANCELLED;
+		}
+
+		BufferBuilder[] finishedBufferBuilders = Arrays.stream(BlockRenderLayerUtil.ALL).map(bufferBuilderPack::getWorldRendererByLayer).map(bufferBuilder -> {
+			if (!bufferBuilder.isDrawing) {
+				return null;
+			}
+			bufferBuilder.finishDrawing();
+			if (bufferBuilder.getVertexCount() == 0) {
+				return null;
+			}
+			return bufferBuilder;
+		}).toArray(BufferBuilder[]::new);
+
+		if (this.canceled()) {
+			return RenderChunkTaskResult.CANCELLED;
+		}
+
+		this.taskDispatcher.runOnRenderThread(() -> {
+			try {
+				if (!this.canceled()) {
+					this.renderChunk.setVisibility(visibilitySet);
+					for (ChunkRenderPass pass : ChunkRenderPass.ALL) {
+						BufferBuilder bufferBuilder = finishedBufferBuilders[pass.ordinal()];
+						if (bufferBuilder == null) {
+							this.renderChunk.setVBOPart(pass, null);
+						} else {
+							this.renderChunk.setVBOPart(pass, this.chunkRenderer.buffer(pass, bufferBuilder.getByteBuffer()));
+							if (pass == ChunkRenderPass.TRANSLUCENT) {
+								this.renderChunk.setTranslucentVertexData(NIOBufferUtil.copyAsUnsafeBuffer(bufferBuilder.getByteBuffer()));
 							}
 						}
 					}
-				} finally {
-					freeBuffer(bufferBuilderPack);
 				}
-			});
+			} finally {
+				freeBuffer(bufferBuilderPack);
+			}
+		});
 
-			return RenderChunkTaskResult.SUCCESSFUL;
-		} catch (Throwable e) {
-			freeBuffer(bufferBuilderPack);
-			throw e;
-		}
+		return RenderChunkTaskResult.SUCCESSFUL;
 	}
 
 	private void renderBlockState(IBlockState blockState, MutableBlockPos pos, VisibilityGraph visibilityGraph, RegionRenderCacheBuilder bufferBuilderPack, Minecraft mc) {
