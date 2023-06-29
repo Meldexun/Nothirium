@@ -3,10 +3,9 @@ package meldexun.nothirium.api.renderer.chunk;
 import javax.annotation.Nullable;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
-import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.SectionPos;
 
-public interface IRenderChunk<N extends IRenderChunk<N>> {
+public interface IRenderChunk {
 
 	default int getX() {
 		return getPos().getBlockX();
@@ -35,11 +34,6 @@ public interface IRenderChunk<N extends IRenderChunk<N>> {
 	SectionPos getPos();
 
 	boolean setCoords(int x, int y, int z);
-
-	@Nullable
-	N getNeighbor(Direction direction);
-
-	void setNeighbor(Direction direction, @Nullable N neighbor);
 
 	@Nullable
 	IVBOPart getVBOPart(ChunkRenderPass pass);

@@ -17,7 +17,7 @@ import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
 
-public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> implements IChunkRenderer<T> {
+public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk> implements IChunkRenderer<T> {
 
 	private final Queue<T> chunkQueue = new ArrayDeque<>();
 	private double lastTransparencyResortX;
@@ -64,7 +64,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk<T>> im
 			addToRenderLists(renderChunk);
 
 			for (Direction direction : Direction.ALL) {
-				T neighbor = renderChunk.getNeighbor(direction);
+				T neighbor = renderChunkProvider.getNeighbor(renderChunk, direction);
 				if (neighbor == null)
 					continue;
 				if (neighbor.lastTimeRecorded == frame)

@@ -6,37 +6,37 @@ public enum Direction {
 
 	DOWN(0, Axis.Y, 0, -1, 0) {
 		@Override
-		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return renderChunk.getY() >= 256 || cameraY > renderChunk.getY();
 		}
 	},
 	UP(1, Axis.Y, 0, 1, 0) {
 		@Override
-		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return renderChunk.getY() < 0 || cameraY < renderChunk.getY() + 16;
 		}
 	},
 	NORTH(2, Axis.Z, 0, 0, -1) {
 		@Override
-		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraZ > renderChunk.getZ();
 		}
 	},
 	SOUTH(3, Axis.Z, 0, 0, 1) {
 		@Override
-		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraZ < renderChunk.getZ() + 16;
 		}
 	},
 	WEST(4, Axis.X, -1, 0, 0) {
 		@Override
-		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraX > renderChunk.getX();
 		}
 	},
 	EAST(5, Axis.X, 1, 0, 0) {
 		@Override
-		public boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ) {
+		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
 			return cameraX < renderChunk.getX() + 16;
 		}
 	};
@@ -123,6 +123,6 @@ public enum Direction {
 		}
 	}
 
-	public abstract boolean isFaceCulled(IRenderChunk<?> renderChunk, double cameraX, double cameraY, double cameraZ);
+	public abstract boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ);
 
 }

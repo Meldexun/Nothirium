@@ -11,10 +11,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import meldexun.nothirium.api.renderer.chunk.IRenderChunk;
+import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.renderer.ChunkRenderManager;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunk;
-import meldexun.nothirium.renderer.chunk.AbstractRenderChunkProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -114,10 +115,10 @@ public class MixinDynamicLight {
 	@Unique
 	private void updateChunkLight(RenderGlobal renderGlobal, BlockPos pos, Set<BlockPos> setPrevPos,
 			Set<BlockPos> setNewPos) {
-		AbstractRenderChunkProvider<?> provider = ChunkRenderManager.getProvider();
-		AbstractRenderChunk<?> chunk = provider.getRenderChunkAt(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+		IRenderChunkProvider<?> provider = ChunkRenderManager.getProvider();
+		IRenderChunk chunk = provider.getRenderChunkAt(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
 		if (chunk != null) {
-			chunk.markDirty();
+			((AbstractRenderChunk) chunk).markDirty();
 		}
 
 		if (setPrevPos != null) {

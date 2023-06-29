@@ -9,7 +9,7 @@ import meldexun.nothirium.util.function.ObjIntIntIntConsumer;
 import meldexun.nothirium.util.function.ObjObjObjObjConsumer;
 import meldexun.nothirium.util.math.MathUtil;
 
-public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<T>> implements IRenderChunkProvider<T> {
+public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk> implements IRenderChunkProvider<T> {
 
 	protected int gridSizeX;
 	protected int gridSizeY;
@@ -17,9 +17,8 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 	protected int cameraChunkX;
 	protected int cameraChunkY;
 	protected int cameraChunkZ;
-	protected AbstractRenderChunk<T>[] chunks;
+	protected AbstractRenderChunk[] chunks;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void init(int renderDistanceX, int renderDistanceY, int renderDistanceZ) {
 		this.gridSizeX = renderDistanceX * 2 + 1;
@@ -105,7 +104,7 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		this.cameraChunkZ = newCameraChunkZ;
 	}
 
-	private static <T extends AbstractRenderChunk<T>> void updateNeighborRelations(int newX, int oldX, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjObjObjObjConsumer<T, T, T, T> neighborUpdateFunc) {
+	private static <T> void updateNeighborRelations(int newX, int oldX, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjObjObjObjConsumer<T, T, T, T> neighborUpdateFunc) {
 		int r = sizeX >> 1;
 		int oldMinX = MathUtil.floorMod(oldX - r, sizeX);
 		int oldMaxX = MathUtil.floorMod(oldX + r, sizeX);
@@ -155,7 +154,7 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		c4.setNeighbor(Direction.SOUTH, null);
 	}
 
-	private static <T extends AbstractRenderChunk<T>> void updateRenderChunkPositions(int x0, int x1, int y0, int y1, int z0, int z1, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
+	private static <T> void updateRenderChunkPositions(int x0, int x1, int y0, int y1, int z0, int z1, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
 		for (int x = x0; x <= x1; x++) {
 			int ix = MathUtil.floorMod(x, sizeX);
 
@@ -171,7 +170,7 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		}
 	}
 
-	private static <T extends AbstractRenderChunk<T>> void updateRenderChunkPositions(int newX, int newY, int newZ, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
+	private static <T> void updateRenderChunkPositions(int newX, int newY, int newZ, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
 		int rx = sizeX >> 1;
 		int ry = sizeY >> 1;
 		int rz = sizeZ >> 1;
@@ -185,7 +184,7 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 		updateRenderChunkPositions(x0, x1, y0, y1, z0, z1, sizeX, sizeY, sizeZ, renderChunkFunc, positionUpdateFunc);
 	}
 
-	private static <T extends AbstractRenderChunk<T>> void updateRenderChunkPositions(int newX, int newY, int newZ, int oldX, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
+	private static <T> void updateRenderChunkPositions(int newX, int newY, int newZ, int oldX, int sizeX, int sizeY, int sizeZ, IntIntInt2ObjFunction<T> renderChunkFunc, ObjIntIntIntConsumer<T> positionUpdateFunc) {
 		int rx = sizeX >> 1;
 		int ry = sizeY >> 1;
 		int rz = sizeZ >> 1;
@@ -250,6 +249,17 @@ public abstract class AbstractRenderChunkProvider<T extends AbstractRenderChunk<
 	@SuppressWarnings("unchecked")
 	private T getRenderChunkAtUnchecked(int chunkX, int chunkY, int chunkZ) {
 		return (T) this.chunks[this.getChunkIndex(chunkX, chunkY, chunkZ)];
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public T getNeighbor(T renderChunk, Direction direction) {
+		return (T) renderChunk.getNeighbor(direction);
+	}
+
+	@Override
+	public void setNeighbor(T renderChunk, Direction direction, T neighbor) {
+		renderChunk.setNeighbor(direction, neighbor);
 	}
 
 	@Override

@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.renderlib.util.Frustum;
 
-public interface IChunkRenderer<T extends IRenderChunk<T>> {
+public interface IChunkRenderer<T extends IRenderChunk> {
 
 	String name();
 

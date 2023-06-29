@@ -4,7 +4,7 @@ import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkTask;
 
-public abstract class AbstractRenderChunkTask<T extends AbstractRenderChunk<T>> implements IRenderChunkTask {
+public abstract class AbstractRenderChunkTask<T extends AbstractRenderChunk> implements IRenderChunkTask {
 
 	protected final IChunkRenderer<?> chunkRenderer;
 	protected final IRenderChunkDispatcher taskDispatcher;

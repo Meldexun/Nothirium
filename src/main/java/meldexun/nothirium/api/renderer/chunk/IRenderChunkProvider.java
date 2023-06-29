@@ -2,7 +2,9 @@ package meldexun.nothirium.api.renderer.chunk;
 
 import javax.annotation.Nullable;
 
-public interface IRenderChunkProvider<T extends IRenderChunk<T>> {
+import meldexun.nothirium.util.Direction;
+
+public interface IRenderChunkProvider<T extends IRenderChunk> {
 
 	void init(int renderDistanceX, int renderDistanceY, int renderDistanceZ);
 
@@ -12,6 +14,11 @@ public interface IRenderChunkProvider<T extends IRenderChunk<T>> {
 
 	@Nullable
 	T getRenderChunkAt(int chunkX, int chunkY, int chunkZ);
+
+	@Nullable
+	T getNeighbor(T renderChunk, Direction direction);
+
+	void setNeighbor(T renderChunk, Direction direction, @Nullable T neighbor);
 
 	void releaseBuffers();
 

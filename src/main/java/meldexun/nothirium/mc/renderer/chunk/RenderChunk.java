@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
-public class RenderChunk extends AbstractRenderChunk<RenderChunk> {
+public class RenderChunk extends AbstractRenderChunk {
 
 	public RenderChunk(int x, int y, int z) {
 		super(x, y, z);

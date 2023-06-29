@@ -1,6 +1,5 @@
 package meldexun.nothirium.renderer.chunk;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,11 +19,10 @@ import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
 
-public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> implements IRenderChunk<N> {
+public abstract class AbstractRenderChunk implements IRenderChunk {
 
 	private SectionPos pos;
-	@SuppressWarnings("unchecked")
-	private final AbstractRenderChunk<N>[] neighbors = new AbstractRenderChunk[Direction.ALL.length];
+	private final AbstractRenderChunk[] neighbors = new AbstractRenderChunk[Direction.ALL.length];
 	public int lastTimeEnqueued = -1;
 	public int lastTimeRecorded = -1;
 	private VisibilitySet visibilitySet = new VisibilitySet();
@@ -57,15 +55,12 @@ public abstract class AbstractRenderChunk<N extends AbstractRenderChunk<N>> impl
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
 	@Nullable
-	public N getNeighbor(Direction direction) {
-		return (N) this.neighbors[direction.ordinal()];
+	AbstractRenderChunk getNeighbor(Direction direction) {
+		return this.neighbors[direction.ordinal()];
 	}
 
-	@Override
-	public void setNeighbor(Direction direction, @Nullable N neighbor) {
+	void setNeighbor(Direction direction, @Nullable AbstractRenderChunk neighbor) {
 		this.neighbors[direction.ordinal()] = neighbor;
 	}
 
