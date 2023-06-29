@@ -12,11 +12,6 @@ import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.renderlib.util.RenderUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 
@@ -31,10 +26,7 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 	}
 
 	@Override
-	public void render(ChunkRenderPass pass) {
-		RenderHelper.disableStandardItemLighting();
-		Minecraft.getMinecraft().entityRenderer.enableLightmap();
-
+	protected void renderChunks(ChunkRenderPass pass) {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbos.get(pass).getVbo());
 		setupClientState(pass);
 		setupAttributePointers(pass);
@@ -55,9 +47,6 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 
 		resetClientState(pass);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
-		GlStateManager.resetColor();
-		Minecraft.getMinecraft().entityRenderer.disableLightmap();
 	}
 
 	protected void setupClientState(ChunkRenderPass pass) {
@@ -99,13 +88,6 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 		GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
 		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 		GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-	}
-
-	@Override
-	protected boolean isSpectator() {
-		Minecraft mc = Minecraft.getMinecraft();
-		Entity cameraEntity = mc.getRenderViewEntity();
-		return cameraEntity instanceof EntityPlayer && ((EntityPlayer) cameraEntity).isSpectator();
 	}
 
 }

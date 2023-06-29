@@ -26,12 +26,12 @@ public class ChunkRendererGL20Optifine extends ChunkRendererGL20 {
 	}
 
 	@Override
-	public void render(ChunkRenderPass pass) {
+	protected void renderChunks(ChunkRenderPass pass) {
 		if (Optifine.IS_FOG_OFF.invoke(null) && Optifine.FOG_STANDARD.getBoolean(Minecraft.getMinecraft().entityRenderer)) {
 			GlStateManager.disableFog();
 		}
 
-		super.render(pass);
+		super.renderChunks(pass);
 	}
 
 	@Override

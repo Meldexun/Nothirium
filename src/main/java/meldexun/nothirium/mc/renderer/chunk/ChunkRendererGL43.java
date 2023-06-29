@@ -29,11 +29,6 @@ import meldexun.renderlib.util.GLBuffer;
 import meldexun.renderlib.util.GLShader;
 import meldexun.renderlib.util.GLUtil;
 import meldexun.renderlib.util.RenderUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
@@ -177,10 +172,7 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 	}
 
 	@Override
-	public void render(ChunkRenderPass pass) {
-		RenderHelper.disableStandardItemLighting();
-		Minecraft.getMinecraft().entityRenderer.enableLightmap();
-
+	protected void renderChunks(ChunkRenderPass pass) {
 		GLShader.push();
 		shader.use();
 		Matrix4f matrix = RenderUtil.getProjectionModelViewMatrix().copy();
@@ -202,9 +194,6 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, 0);
 		GL30.glBindVertexArray(0);
 		GLShader.pop();
-
-		GlStateManager.resetColor();
-		Minecraft.getMinecraft().entityRenderer.disableLightmap();
 	}
 
 	@Override
@@ -215,13 +204,6 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		commandBuffers.stream().flatMap(Enum2ObjMap::stream).filter(Objects::nonNull).forEach(GLBuffer::dispose);
 		vaos.stream().flatMapToInt(Enum2IntMap::streamInt).forEach(GL30::glDeleteVertexArrays);
 		syncs.streamInt().filter(i -> i != -1).forEach(GL15::glDeleteQueries);
-	}
-
-	@Override
-	protected boolean isSpectator() {
-		Minecraft mc = Minecraft.getMinecraft();
-		Entity cameraEntity = mc.getRenderViewEntity();
-		return cameraEntity instanceof EntityPlayer && ((EntityPlayer) cameraEntity).isSpectator();
 	}
 
 }
