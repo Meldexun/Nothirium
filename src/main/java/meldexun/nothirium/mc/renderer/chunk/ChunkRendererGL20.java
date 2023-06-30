@@ -8,11 +8,17 @@ import org.lwjgl.util.vector.Vector3f;
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.mc.Nothirium;
+import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.util.ListUtil;
 import meldexun.renderlib.util.RenderUtil;
 
 public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
+
+	@Override
+	public RenderEngine getRenderEngine() {
+		return RenderEngine.GL20;
+	}
 
 	@Override
 	public String name() {

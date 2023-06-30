@@ -4,12 +4,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import meldexun.nothirium.opengl.GLHelper;
-import meldexun.nothirium.opengl.GLTest;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod(modid = Nothirium.MODID, dependencies = "required-after:renderlib@[1.3.1,)")
 public class Nothirium {
@@ -24,7 +28,8 @@ public class Nothirium {
 	@EventHandler
 	public void onFMLConstructionEvent(FMLConstructionEvent event) {
 		GLHelper.init();
-		GLTest.runTests();
+
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@EventHandler
@@ -33,6 +38,13 @@ public class Nothirium {
 		isChunkAnimatorInstalled = Loader.isModLoaded("chunkanimator");
 		isFluidloggedAPIInstalled = Loader.isModLoaded("fluidlogged_api");
 		isCubicChunksInstalled = Loader.isModLoaded("cubicchunks");
+	}
+
+	@SubscribeEvent
+	public void onConfigChangedEvent(OnConfigChangedEvent event) {
+		if (event.getModID().equals(MODID)) {
+			ConfigManager.sync(MODID, Config.Type.INSTANCE);
+		}
 	}
 
 }

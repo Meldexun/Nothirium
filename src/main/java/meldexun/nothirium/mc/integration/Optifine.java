@@ -4,7 +4,9 @@ import javax.annotation.Nullable;
 
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.mc.asm.NothiriumPlugin;
-import meldexun.nothirium.opengl.GLTest;
+import meldexun.nothirium.mc.config.NothiriumConfig;
+import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
+import meldexun.nothirium.mc.renderer.chunk.MinecraftChunkRenderer;
 import meldexun.reflectionutil.ReflectionField;
 import meldexun.reflectionutil.ReflectionMethod;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -39,21 +41,24 @@ public class Optifine {
 	public static final ReflectionMethod<Void> SETUP_ARRAY_POINTERS_VBO = new ReflectionMethod<>("net.optifine.shaders.ShadersRender", "setupArrayPointersVbo", "setupArrayPointersVbo");
 	public static final ReflectionMethod<Void> POST_RENDER_CHUNK_LAYER = new ReflectionMethod<>("net.optifine.shaders.ShadersRender", "postRenderChunkLayer", "postRenderChunkLayer", BlockRenderLayer.class);
 
-	public static IChunkRenderer<?> initChunkRenderer(@Nullable IChunkRenderer<?> oldChunkRenderer) {
-		if (GLTest.glMultiDrawArraysIndirect && oldChunkRenderer != null) {
-			if (oldChunkRenderer instanceof ChunkRendererGL43Optifine == IS_SHADERS.invoke(null)) {
-				oldChunkRenderer.dispose();
-				oldChunkRenderer = null;
-			}
+	public static IChunkRenderer<?> createChunkRenderer(@Nullable IChunkRenderer<?> oldChunkRenderer) {
+		RenderEngine renderEngine = IS_SHADERS.invoke(null) ? RenderEngine.GL20 : NothiriumConfig.getRenderEngine();
+		if (oldChunkRenderer != null && ((MinecraftChunkRenderer) oldChunkRenderer).getRenderEngine() != renderEngine) {
+			oldChunkRenderer.dispose();
+			oldChunkRenderer = null;
 		}
-		if (oldChunkRenderer == null) {
-			if (GLTest.glMultiDrawArraysIndirect && !IS_SHADERS.invoke(null)) {
-				return new ChunkRendererGL43Optifine();
-			} else {
-				return new ChunkRendererGL20Optifine();
-			}
+		if (oldChunkRenderer != null) {
+			return oldChunkRenderer;
 		}
-		return oldChunkRenderer;
+
+		switch (renderEngine) {
+		case GL43:
+			return new ChunkRendererGL43Optifine();
+		case GL20:
+			return new ChunkRendererGL20Optifine();
+		default:
+			throw new UnsupportedOperationException();
+		}
 	}
 
 }

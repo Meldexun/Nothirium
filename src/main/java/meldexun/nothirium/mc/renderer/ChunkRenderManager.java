@@ -1,15 +1,19 @@
 package meldexun.nothirium.mc.renderer;
 
+import javax.annotation.Nullable;
+
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
+import meldexun.nothirium.mc.config.NothiriumConfig;
+import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
 import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL43;
+import meldexun.nothirium.mc.renderer.chunk.MinecraftChunkRenderer;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkDispatcher;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkProvider;
-import meldexun.nothirium.opengl.GLTest;
 import meldexun.renderlib.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 
@@ -36,15 +40,9 @@ public class ChunkRenderManager {
 
 	public static void allChanged() {
 		if (Optifine.OPTIFINE_DETECTED) {
-			chunkRenderer = Optifine.initChunkRenderer(chunkRenderer);
+			chunkRenderer = Optifine.createChunkRenderer(chunkRenderer);
 		} else {
-			if (chunkRenderer == null) {
-				if (GLTest.glMultiDrawArraysIndirect) {
-					chunkRenderer = new ChunkRendererGL43();
-				} else {
-					chunkRenderer = new ChunkRendererGL20();
-				}
-			}
+			chunkRenderer = createChunkRenderer(chunkRenderer);
 		}
 		if (renderChunkProvider != null) {
 			renderChunkProvider.releaseBuffers();
@@ -59,6 +57,26 @@ public class ChunkRenderManager {
 		int renderDistance = mc.gameSettings.renderDistanceChunks;
 		renderChunkProvider.init(renderDistance, renderDistance, renderDistance);
 		chunkRenderer.init(renderDistance);
+	}
+
+	private static IChunkRenderer<?> createChunkRenderer(@Nullable IChunkRenderer<?> oldChunkRenderer) {
+		RenderEngine renderEngine = NothiriumConfig.getRenderEngine();
+		if (oldChunkRenderer != null && ((MinecraftChunkRenderer) oldChunkRenderer).getRenderEngine() != renderEngine) {
+			oldChunkRenderer.dispose();
+			oldChunkRenderer = null;
+		}
+		if (oldChunkRenderer != null) {
+			return oldChunkRenderer;
+		}
+
+		switch (renderEngine) {
+		case GL43:
+			return new ChunkRendererGL43();
+		case GL20:
+			return new ChunkRendererGL20();
+		default:
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	public static void dispose() {

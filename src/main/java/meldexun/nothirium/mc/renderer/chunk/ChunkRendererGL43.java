@@ -17,6 +17,7 @@ import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.Nothirium;
+import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.mc.util.FogUtil;
 import meldexun.nothirium.mc.util.ResourceSupplier;
@@ -72,6 +73,11 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		this.commandBuffers = new MultiObject<>(bufferCount, i -> new Enum2ObjMap<>(ChunkRenderPass.class));
 		this.syncs = new IntMultiObject(bufferCount, i -> -1);
 		this.vbos.forEach((pass, vbo) -> vbo.addListener(() -> this.initVAOs(pass)));
+	}
+
+	@Override
+	public RenderEngine getRenderEngine() {
+		return RenderEngine.GL43;
 	}
 
 	@Override

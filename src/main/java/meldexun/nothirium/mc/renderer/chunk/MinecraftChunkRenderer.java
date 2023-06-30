@@ -1,6 +1,7 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
+import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
 import meldexun.nothirium.renderer.chunk.AbstractChunkRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -9,6 +10,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
 public abstract class MinecraftChunkRenderer extends AbstractChunkRenderer<RenderChunk> {
+
+	public abstract RenderEngine getRenderEngine();
 
 	@Override
 	public final void render(ChunkRenderPass pass) {
