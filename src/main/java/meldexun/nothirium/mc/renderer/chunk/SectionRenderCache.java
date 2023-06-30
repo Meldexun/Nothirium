@@ -3,6 +3,7 @@ package meldexun.nothirium.mc.renderer.chunk;
 import javax.annotation.Nullable;
 
 import meldexun.nothirium.mc.integration.Optifine;
+import meldexun.nothirium.mc.util.WorldUtil;
 import meldexun.nothirium.mc.util.LightUtil;
 import meldexun.nothirium.util.SectionPos;
 import meldexun.nothirium.util.cache.ArrayCache;
@@ -52,14 +53,9 @@ public class SectionRenderCache implements IBlockAccess {
 		this.sectionCache = new Cache3D<>(minChunkX, minChunkY, minChunkZ, maxChunkX, maxChunkY, maxChunkZ, null, ExtendedBlockStorage[]::new);
 		for (int x = minChunkX; x <= maxChunkX; x++) {
 			for (int z = minChunkZ; z <= maxChunkZ; z++) {
-				Chunk chunk = this.chunkCache.computeIfAbsent(x, z, world::getChunk);
+				this.chunkCache.computeIfAbsent(x, z, world::getChunk);
 				for (int y = minChunkY; y <= maxChunkY; y++) {
-					this.sectionCache.computeIfAbsent(x, y, z, (chunkX, chunkY, chunkZ) -> {
-						if (chunkY < 0 || chunkY >= 16) {
-							return null;
-						}
-						return chunk.getBlockStorageArray()[chunkY];
-					});
+					this.sectionCache.computeIfAbsent(x, y, z, WorldUtil::getSection);
 				}
 			}
 		}

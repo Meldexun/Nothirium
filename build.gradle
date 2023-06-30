@@ -51,6 +51,7 @@ dependencies {
 
     buildDependencies fg.deobf('curse.maven:ChunkAnimator-236484:3850023')
     buildDependencies fg.deobf('curse.maven:FluidloggedAPI-485654:3956311')
+    buildDependencies fg.deobf('curse.maven:CubicChunks-292243:3546640')
 }
 
 minecraft {

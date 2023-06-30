@@ -19,6 +19,7 @@ public class Nothirium {
 	public static boolean isBetterFoliageInstalled;
 	public static boolean isChunkAnimatorInstalled;
 	public static boolean isFluidloggedAPIInstalled;
+	public static boolean isCubicChunksInstalled;
 
 	@EventHandler
 	public void onFMLConstructionEvent(FMLConstructionEvent event) {
@@ -31,6 +32,7 @@ public class Nothirium {
 		isBetterFoliageInstalled = Loader.isModLoaded("betterfoliage");
 		isChunkAnimatorInstalled = Loader.isModLoaded("chunkanimator");
 		isFluidloggedAPIInstalled = Loader.isModLoaded("fluidlogged_api");
+		isCubicChunksInstalled = Loader.isModLoaded("cubicchunks");
 	}
 
 }

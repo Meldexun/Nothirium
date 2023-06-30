@@ -1,19 +1,27 @@
 package meldexun.nothirium.util;
 
 import meldexun.nothirium.api.renderer.chunk.IRenderChunk;
+import meldexun.nothirium.mc.Nothirium;
+import meldexun.nothirium.mc.integration.CubicChunks;
 
 public enum Direction {
 
 	DOWN(0, Axis.Y, 0, -1, 0) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
-			return renderChunk.getY() >= 256 || cameraY > renderChunk.getY();
+			// TODO move this into the mc package
+			if ((!Nothirium.isCubicChunksInstalled || !CubicChunks.isCubicWorld()) && renderChunk.getSectionY() >= 16)
+				return true;
+			return cameraY > renderChunk.getY();
 		}
 	},
 	UP(1, Axis.Y, 0, 1, 0) {
 		@Override
 		public boolean isFaceCulled(IRenderChunk renderChunk, double cameraX, double cameraY, double cameraZ) {
-			return renderChunk.getY() < 0 || cameraY < renderChunk.getY() + 16;
+			// TODO move this into the mc package
+			if ((!Nothirium.isCubicChunksInstalled || !CubicChunks.isCubicWorld()) && renderChunk.getSectionY() < 0)
+				return true;
+			return cameraY < renderChunk.getY() + 16;
 		}
 	},
 	NORTH(2, Axis.Z, 0, 0, -1) {
