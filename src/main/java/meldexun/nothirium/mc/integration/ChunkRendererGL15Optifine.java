@@ -2,18 +2,18 @@ package meldexun.nothirium.mc.integration;
 
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
-import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
+import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL15;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunk;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
 import meldexun.renderlib.util.Frustum;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class ChunkRendererGL20Optifine extends ChunkRendererGL20 {
+public class ChunkRendererGL15Optifine extends ChunkRendererGL15 {
 
 	@Override
 	public String name() {
-		return "Nothirium GL 2.0 (Optifine)";
+		return "Nothirium GL 1.5 (Optifine)";
 	}
 
 	@Override

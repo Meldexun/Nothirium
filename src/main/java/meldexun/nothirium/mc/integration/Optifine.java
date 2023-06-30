@@ -42,7 +42,7 @@ public class Optifine {
 	public static final ReflectionMethod<Void> POST_RENDER_CHUNK_LAYER = new ReflectionMethod<>("net.optifine.shaders.ShadersRender", "postRenderChunkLayer", "postRenderChunkLayer", BlockRenderLayer.class);
 
 	public static IChunkRenderer<?> createChunkRenderer(@Nullable IChunkRenderer<?> oldChunkRenderer) {
-		RenderEngine renderEngine = IS_SHADERS.invoke(null) ? RenderEngine.GL20 : NothiriumConfig.getRenderEngine();
+		RenderEngine renderEngine = IS_SHADERS.invoke(null) ? RenderEngine.GL15 : NothiriumConfig.getRenderEngine();
 		if (oldChunkRenderer != null && ((MinecraftChunkRenderer) oldChunkRenderer).getRenderEngine() != renderEngine) {
 			oldChunkRenderer.dispose();
 			oldChunkRenderer = null;
@@ -54,8 +54,8 @@ public class Optifine {
 		switch (renderEngine) {
 		case GL43:
 			return new ChunkRendererGL43Optifine();
-		case GL20:
-			return new ChunkRendererGL20Optifine();
+		case GL15:
+			return new ChunkRendererGL15Optifine();
 		default:
 			throw new UnsupportedOperationException();
 		}

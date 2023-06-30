@@ -13,16 +13,16 @@ import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.util.ListUtil;
 import meldexun.renderlib.util.RenderUtil;
 
-public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
+public class ChunkRendererGL15 extends ChunkRendererDynamicVbo {
 
 	@Override
 	public RenderEngine getRenderEngine() {
-		return RenderEngine.GL20;
+		return RenderEngine.GL15;
 	}
 
 	@Override
 	public String name() {
-		return "Nothirium GL 2.0";
+		return "Nothirium GL 1.5";
 	}
 
 	@Override
