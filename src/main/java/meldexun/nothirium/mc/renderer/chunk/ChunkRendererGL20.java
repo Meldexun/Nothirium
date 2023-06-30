@@ -1,7 +1,5 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
-import java.util.List;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
@@ -11,6 +9,7 @@ import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
+import meldexun.nothirium.util.ListUtil;
 import meldexun.renderlib.util.RenderUtil;
 
 public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
@@ -31,19 +30,12 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 		setupClientState(pass);
 		setupAttributePointers(pass);
 
-		List<RenderChunk> list = chunks.get(pass);
 		double cameraX = RenderUtil.getCameraEntityX();
 		double cameraY = RenderUtil.getCameraEntityY();
 		double cameraZ = RenderUtil.getCameraEntityZ();
-		if (pass != ChunkRenderPass.TRANSLUCENT) {
-			for (int i = 0; i < list.size(); i++) {
-				this.draw(list.get(i), pass, cameraX, cameraY, cameraZ);
-			}
-		} else {
-			for (int i = 0; i < list.size(); i++) {
-				this.draw(list.get(list.size() - 1 - i), pass, cameraX, cameraY, cameraZ);
-			}
-		}
+		ListUtil.forEach(chunks.get(pass), pass == ChunkRenderPass.TRANSLUCENT, (renderChunk, i) -> {
+			this.draw(renderChunk, pass, cameraX, cameraY, cameraZ);
+		});
 
 		resetClientState(pass);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);

@@ -20,6 +20,7 @@ import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.mc.util.FogUtil;
 import meldexun.nothirium.mc.util.ResourceSupplier;
+import meldexun.nothirium.util.ListUtil;
 import meldexun.nothirium.util.collection.Enum2IntMap;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.collection.IntMultiObject;
@@ -135,15 +136,9 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		}
 
 		this.chunks.forEach((pass, list) -> {
-			if (pass != ChunkRenderPass.TRANSLUCENT) {
-				for (int i = 0; i < list.size(); i++) {
-					this.record(list.get(i), pass, i, cameraX, cameraY, cameraZ);
-				}
-			} else {
-				for (int i = 0; i < list.size(); i++) {
-					this.record(list.get(list.size() - 1 - i), pass, i, cameraX, cameraY, cameraZ);
-				}
-			}
+			ListUtil.forEach(list, pass == ChunkRenderPass.TRANSLUCENT, (renderChunk, i) -> {
+				this.record(renderChunk, pass, i, cameraX, cameraY, cameraZ);
+			});
 		});
 
 		offsetBuffers.get().forEach(GLBuffer::unmap);
