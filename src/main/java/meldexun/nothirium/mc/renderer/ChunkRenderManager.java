@@ -11,6 +11,7 @@ import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
 import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL15;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
+import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL42;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL43;
 import meldexun.nothirium.mc.renderer.chunk.MinecraftChunkRenderer;
 import meldexun.nothirium.mc.renderer.chunk.RenderChunkDispatcher;
@@ -73,6 +74,8 @@ public class ChunkRenderManager {
 		switch (renderEngine) {
 		case GL43:
 			return new ChunkRendererGL43();
+		case GL42:
+			return new ChunkRendererGL42();
 		case GL20:
 			return new ChunkRendererGL20();
 		case GL15:
