@@ -54,6 +54,8 @@ public class Optifine {
 		switch (renderEngine) {
 		case GL43:
 			return new ChunkRendererGL43Optifine();
+		case GL20:
+			return new ChunkRendererGL20Optifine();
 		case GL15:
 			return new ChunkRendererGL15Optifine();
 		default:
