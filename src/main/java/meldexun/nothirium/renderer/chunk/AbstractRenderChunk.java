@@ -74,6 +74,7 @@ public abstract class AbstractRenderChunk implements IRenderChunk {
 	}
 
 	public boolean isFogCulled(double cameraX, double cameraY, double cameraZ, double fogEndSqr) {
+		// TODO support other fog shapes
 		double x = MathUtil.clamp(cameraX, this.getX(), this.getX() + 16) - cameraX;
 		double y = MathUtil.clamp(cameraY, this.getY(), this.getY() + 16) - cameraY;
 		double z = MathUtil.clamp(cameraZ, this.getZ(), this.getZ() + 16) - cameraZ;
