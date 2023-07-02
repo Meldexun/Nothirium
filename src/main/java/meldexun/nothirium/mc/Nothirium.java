@@ -3,11 +3,14 @@ package meldexun.nothirium.mc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import meldexun.nothirium.mc.config.NothiriumConfig;
+import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
 import meldexun.nothirium.opengl.GLHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -43,7 +46,13 @@ public class Nothirium {
 	@SubscribeEvent
 	public void onConfigChangedEvent(OnConfigChangedEvent event) {
 		if (event.getModID().equals(MODID)) {
+			RenderEngine oldRenderEngine = NothiriumConfig.renderEngine;
+
 			ConfigManager.sync(MODID, Config.Type.INSTANCE);
+
+			if (event.isWorldRunning() && oldRenderEngine != NothiriumConfig.renderEngine) {
+				FMLCommonHandler.instance().reloadRenderers();
+			}
 		}
 	}
 
