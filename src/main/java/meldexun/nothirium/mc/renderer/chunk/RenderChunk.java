@@ -31,7 +31,7 @@ public class RenderChunk extends AbstractRenderChunk {
 	@Override
 	public void markDirty() {
 		if ((!Nothirium.isCubicChunksInstalled || !CubicChunks.isCubicWorld())
-				&& (this.getSectionX() < 0 || this.getSectionY() >= 16)) {
+				&& (this.getSectionY() < 0 || this.getSectionY() >= 16)) {
 			this.getVisibility().setAllVisible();
 			return;
 		}
