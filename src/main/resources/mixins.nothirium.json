@@ -7,6 +7,7 @@
   "mixins": [
   ],
   "client": [
+    "malisiscore.MixinAnimatedRenderer",
     "optifine.MixinDynamicLight",
     "optifine.MixinEntityRenderer",
     "vertex.MixinBufferBuilder",
