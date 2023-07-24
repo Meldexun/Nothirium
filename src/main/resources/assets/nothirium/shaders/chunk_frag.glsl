@@ -15,7 +15,7 @@ varying vec2 v_TexCoord;
 varying vec2 v_LightCoord;
 varying float v_VertDistance;
 
-float smoothstep(float edge0, float edge1, float x) {
+float c_smoothstep(float edge0, float edge1, float x) {
     float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
     return t * t * (3.0 - 2.0 * t);
 }
@@ -25,7 +25,7 @@ vec4 linear_fog(vec4 inColor, float vertexDistance) {
         return inColor;
     }
 
-    float fogValue = vertexDistance < u_FogEnd ? smoothstep(u_FogStart, u_FogEnd, vertexDistance) : 1.0;
+    float fogValue = vertexDistance < u_FogEnd ? c_smoothstep(u_FogStart, u_FogEnd, vertexDistance) : 1.0;
     return vec4(mix(inColor.rgb, u_FogColor.rgb, fogValue * u_FogColor.a), inColor.a);
 }
 
