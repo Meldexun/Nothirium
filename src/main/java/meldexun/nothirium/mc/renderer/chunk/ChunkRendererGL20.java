@@ -61,8 +61,7 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 	protected void renderChunks(ChunkRenderPass pass) {
 		GLShader.push();
 		shader.use();
-		Matrix4f matrix = RenderUtil.getProjectionModelViewMatrix().copy();
-		matrix.translate((float) RenderUtil.getCameraOffsetX(), (float) RenderUtil.getCameraOffsetY(), (float) RenderUtil.getCameraOffsetZ());
+		Matrix4f matrix = RenderUtil.getProjectionModelViewMatrix();
 		GLUtil.setMatrix(shader.getUniform(U_MATRIX), matrix);
 		FogUtil.setupFogFromGL(shader);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbos.get(pass).getVbo());
