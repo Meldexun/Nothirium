@@ -21,9 +21,6 @@ public class MixinVertexFormat {
 	private List<VertexFormatElement> elements;
 	@Shadow
 	@Final
-	private List<Integer> offsets;
-	@Shadow
-	@Final
 	private int vertexSize;
 
 	@ModifyVariable(method = "addElement", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0, shift = Shift.BY, by = -2), index = 1, ordinal = 0, name = "element")
