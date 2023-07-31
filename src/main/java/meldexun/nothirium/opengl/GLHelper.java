@@ -1,43 +1,14 @@
 package meldexun.nothirium.opengl;
 
-import org.lwjgl.opengl.ContextCapabilities;
+import java.nio.ByteBuffer;
+
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL45;
 
-import meldexun.matrixutil.MemoryUtil;
-import meldexun.reflectionutil.ReflectionField;
-import meldexun.reflectionutil.ReflectionMethod;
 import meldexun.renderlib.util.GLUtil;
 
 public class GLHelper {
-
-	private static final ReflectionMethod<Void> NGL_GET_BUFFER_SUB_DATA = new ReflectionMethod<>(GL15.class,
-			"nglGetBufferSubData", "nglGetBufferSubData", int.class, long.class, long.class, long.class, long.class);
-	private static final ReflectionMethod<Void> NGL_BUFFER_SUB_DATA = new ReflectionMethod<>(GL15.class,
-			"nglBufferSubData", "nglBufferSubData", int.class, long.class, long.class, long.class, long.class);
-
-	private static long glGetBufferSubData;
-	private static long glBufferSubData;
-
-	public static void init() {
-		glGetBufferSubData = new ReflectionField<>(ContextCapabilities.class, "glGetBufferSubData",
-				"glGetBufferSubData").getLong(GLUtil.CAPS);
-		glBufferSubData = new ReflectionField<>(ContextCapabilities.class, "glBufferSubData", "glBufferSubData")
-				.getLong(GLUtil.CAPS);
-	}
-
-	private static long glMapBuffer(int target, int access, long length) {
-		return MemoryUtil.getAddress(GL15.glMapBuffer(target, access, length, null));
-	}
-
-	private static void glGetBufferSubData(int target, long offset, long size, long address) {
-		NGL_GET_BUFFER_SUB_DATA.invoke(null, target, offset, size, address, glGetBufferSubData);
-	}
-
-	private static void glBufferSubData(int target, long offset, long size, long address) {
-		NGL_BUFFER_SUB_DATA.invoke(null, target, offset, size, address, glBufferSubData);
-	}
 
 	public static int growBuffer(int vbo, long oldSize, long newSize) {
 		if (GLUtil.CAPS.OpenGL45) {
@@ -60,11 +31,11 @@ public class GLHelper {
 			int temp = GL15.glGenBuffers();
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, temp);
 			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, oldSize, GL15.GL_STREAM_COPY);
-			long tempAddress = glMapBuffer(GL15.GL_ARRAY_BUFFER, GL15.GL_READ_WRITE, oldSize);
+			ByteBuffer tempBuffer = GL15.glMapBuffer(GL15.GL_ARRAY_BUFFER, GL15.GL_READ_WRITE, oldSize, null);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-			glGetBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, oldSize, tempAddress);
+			GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, tempBuffer);
 			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, newSize, GL15.GL_STREAM_DRAW);
-			glBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, oldSize, tempAddress);
+			GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, tempBuffer);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, temp);
 			GL15.glUnmapBuffer(GL15.GL_ARRAY_BUFFER);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);

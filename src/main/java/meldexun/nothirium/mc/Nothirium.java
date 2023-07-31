@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 
 import meldexun.nothirium.mc.config.NothiriumConfig;
 import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
-import meldexun.nothirium.opengl.GLHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -30,8 +29,6 @@ public class Nothirium {
 
 	@EventHandler
 	public void onFMLConstructionEvent(FMLConstructionEvent event) {
-		GLHelper.init();
-
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
