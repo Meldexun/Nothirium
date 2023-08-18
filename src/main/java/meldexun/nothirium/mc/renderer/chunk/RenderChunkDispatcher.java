@@ -42,7 +42,7 @@ public class RenderChunkDispatcher implements IRenderChunkDispatcher {
 		if (Thread.currentThread() == this.thread) {
 			return CompletableFuture.completedFuture(supplier.get());
 		} else {
-			return CompletableFuture.supplyAsync(supplier, this.taskQueue::add);
+			return crashMinecraftOnError(CompletableFuture.supplyAsync(supplier, this.taskQueue::add));
 		}
 	}
 
@@ -57,16 +57,16 @@ public class RenderChunkDispatcher implements IRenderChunkDispatcher {
 			runnable.run();
 			return CompletableFuture.completedFuture(null);
 		} else {
-			return CompletableFuture.runAsync(runnable, this.taskQueue::add);
+			return crashMinecraftOnError(CompletableFuture.runAsync(runnable, this.taskQueue::add));
 		}
 	}
 
 	private static <T> CompletableFuture<T> crashMinecraftOnError(CompletableFuture<T> future) {
-		return future.whenCompleteAsync((r, t) -> {
+		return future.whenComplete((r, t) -> {
 			if (t != null) {
 				Minecraft.getMinecraft().crashed(new CrashReport("Failed compiling chunk", t));
 			}
-		}, ForkJoinPool.commonPool());
+		});
 	}
 
 	@Override
