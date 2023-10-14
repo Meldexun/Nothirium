@@ -1,6 +1,7 @@
 package meldexun.nothirium.mc.vertex;
 
 import meldexun.matrixutil.UnsafeUtil;
+import meldexun.nothirium.mc.integration.CensoredASM;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import sun.misc.Unsafe;
 
@@ -13,6 +14,7 @@ public class TextureCoordinateUploader {
 			long address = buffer.getAddress() + buffer.getOffset();
 			unsafe.putFloat(address, (float) u);
 			unsafe.putFloat(address + 4, (float) v);
+			CensoredASM.triggerSpriteOnBufferAccess(buffer, (float)u, (float)v);
 		}
 
 		@Override

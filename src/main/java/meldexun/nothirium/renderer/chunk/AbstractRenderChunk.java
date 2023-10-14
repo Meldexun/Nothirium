@@ -1,10 +1,12 @@
 package meldexun.nothirium.renderer.chunk;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableSet;
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
@@ -19,6 +21,7 @@ import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
 import meldexun.renderlib.util.memory.UnsafeByteBuffer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public abstract class AbstractRenderChunk implements IRenderChunk {
 
@@ -27,6 +30,7 @@ public abstract class AbstractRenderChunk implements IRenderChunk {
 	public int lastTimeEnqueued = -1;
 	public int lastTimeRecorded = -1;
 	private VisibilitySet visibilitySet = new VisibilitySet();
+	private Set<TextureAtlasSprite> visibleTextures = ImmutableSet.of();
 	public int visibleDirections;
 	private boolean dirty;
 	private IRenderChunkTask lastCompileTask;
@@ -71,6 +75,14 @@ public abstract class AbstractRenderChunk implements IRenderChunk {
 
 	public void setVisibility(VisibilitySet visibilitySet) {
 		this.visibilitySet = visibilitySet;
+	}
+
+	public void setVisibleTextures(Set<TextureAtlasSprite> visibleTextures) {
+		this.visibleTextures = visibleTextures;
+	}
+
+	public Set<TextureAtlasSprite> getVisibleTextures() {
+		return visibleTextures;
 	}
 
 	public boolean isFogCulled(double cameraX, double cameraY, double cameraZ, double fogEndSqr) {
