@@ -25,6 +25,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk> imple
 	private double lastTransparencyResortZ;
 	private int renderedChunks;
 	protected final Enum2ObjMap<ChunkRenderPass, List<T>> chunks = new Enum2ObjMap<>(ChunkRenderPass.class, (Supplier<List<T>>) ArrayList::new);
+	protected final List<T> chunksAnyPass = new ArrayList<>();
 
 	protected AbstractChunkRenderer() {
 
@@ -40,6 +41,10 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk> imple
 		return chunks.get(pass).size();
 	}
 
+	public List<T> getRenderChunks() {
+		return chunksAnyPass;
+	}
+
 	@Override
 	public void setup(IRenderChunkProvider<T> renderChunkProvider, double cameraX, double cameraY, double cameraZ, Frustum frustum, int frame) {
 		this.resortTransparency(cameraX, cameraY, cameraZ, frustum);
@@ -50,6 +55,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk> imple
 
 		renderedChunks = 0;
 		chunks.forEach(List::clear);
+		chunksAnyPass.clear();
 		T rootRenderChunk = renderChunkProvider.getRenderChunkAt(chunkX, chunkY, chunkZ);
 		rootRenderChunk.visibleDirections = 0x3F;
 		chunkQueue.add(rootRenderChunk);
@@ -127,6 +133,7 @@ public abstract class AbstractChunkRenderer<T extends AbstractRenderChunk> imple
 				list.add(renderChunk);
 			}
 		});
+		chunksAnyPass.add(renderChunk);
 	}
 
 	protected abstract boolean isSpectator();

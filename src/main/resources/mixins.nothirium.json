@@ -16,7 +16,8 @@
     "MixinBetterBiomeBlend",
     "MixinBlock",
     "MixinGuiOverlayDebug",
-    "MixinRenderGlobal"
+    "MixinRenderGlobal",
+    "MixinTextureMap"
   ],
   "injectors": {
     "defaultRequire": 1

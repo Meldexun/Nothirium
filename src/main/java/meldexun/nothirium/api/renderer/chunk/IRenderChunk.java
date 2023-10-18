@@ -4,6 +4,9 @@ import javax.annotation.Nullable;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.util.SectionPos;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+
+import java.util.Set;
 
 public interface IRenderChunk {
 
@@ -39,6 +42,8 @@ public interface IRenderChunk {
 	IVBOPart getVBOPart(ChunkRenderPass pass);
 
 	void setVBOPart(ChunkRenderPass pass, @Nullable IVBOPart vboPart);
+
+	Set<TextureAtlasSprite> getVisibleTextures();
 
 	boolean isEmpty();
 

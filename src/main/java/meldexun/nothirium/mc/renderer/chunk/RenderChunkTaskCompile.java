@@ -1,10 +1,13 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
 
+import meldexun.nothirium.mc.integration.CensoredASM;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.lwjgl.opengl.GL11;
 
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
@@ -103,6 +106,8 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 		MutableBlockPos pos = new MutableBlockPos();
 		VisibilityGraph visibilityGraph = new VisibilityGraph();
 
+		CensoredASM.startCapturingChunkTextures();
+
 		for (int x = 0; x < 16; x++) {
 			for (int y = 0; y < 16; y++) {
 				for (int z = 0; z < 16; z++) {
@@ -120,6 +125,8 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 				return RenderChunkTaskResult.CANCELLED;
 			}
 		}
+
+		Set<TextureAtlasSprite> visibleTextures = CensoredASM.stopCapturingChunkTextures();
 
 		VisibilitySet visibilitySet = visibilityGraph.compute();
 
@@ -156,6 +163,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 			try {
 				if (!this.canceled()) {
 					this.renderChunk.setVisibility(visibilitySet);
+					this.renderChunk.setVisibleTextures(visibleTextures);
 					for (ChunkRenderPass pass : ChunkRenderPass.ALL) {
 						BufferBuilder bufferBuilder = finishedBufferBuilders[pass.ordinal()];
 						if (bufferBuilder == null) {

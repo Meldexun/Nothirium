@@ -1,6 +1,7 @@
 package meldexun.nothirium.api.renderer.chunk;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.renderlib.util.Frustum;
@@ -12,6 +13,8 @@ public interface IChunkRenderer<T extends IRenderChunk> {
 	int renderedChunks();
 
 	int renderedChunks(ChunkRenderPass pass);
+
+	List<T> getRenderChunks();
 
 	void init(int renderDistance);
 
