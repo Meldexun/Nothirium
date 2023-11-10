@@ -32,18 +32,34 @@ repositories {
     }
 
     maven { url = 'https://www.cursemaven.com' }
+
+    maven { url = 'https://maven.cleanroommc.com' }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-    implementation "org.spongepowered:mixin:${mixin_version}"
-    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+    // implementation "org.spongepowered:mixin:${mixin_version}"
+    // annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+
+    // Common:
+    annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
+    annotationProcessor 'com.google.guava:guava:32.1.2-jre'
+    annotationProcessor 'com.google.code.gson:gson:2.8.9'
+
+    // ForgeGradle:
+    implementation ('zone.rong:mixinbooter:8.8') {
+        transitive = false
+    }
+    annotationProcessor ('zone.rong:mixinbooter:8.8') {
+        transitive = false
+    }
 
     atDependencies fg.deobf('meldexun:RenderLib:1.12.2-1.3.1@jar')
 
     buildDependencies fg.deobf('curse.maven:ChunkAnimator-236484:3850023')
     buildDependencies fg.deobf('curse.maven:FluidloggedAPI-485654:3956311')
     buildDependencies fg.deobf('curse.maven:CubicChunks-292243:3546640')
+    buildDependencies fg.deobf('curse.maven:CompactMachines-224218:2707509')
 }
 
 minecraft {

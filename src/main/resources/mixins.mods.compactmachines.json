@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "meldexun.nothirium.mc.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mixins.nothirium.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "MixinCompactMachines"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
