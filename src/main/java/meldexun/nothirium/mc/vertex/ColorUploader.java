@@ -2,7 +2,7 @@ package meldexun.nothirium.mc.vertex;
 
 import java.nio.ByteOrder;
 
-import meldexun.matrixutil.UnsafeUtil;
+import meldexun.memoryutil.UnsafeUtil;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import sun.misc.Unsafe;
 

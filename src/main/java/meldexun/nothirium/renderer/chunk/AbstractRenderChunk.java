@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
+import meldexun.memoryutil.UnsafeByteBuffer;
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
@@ -18,7 +19,6 @@ import meldexun.nothirium.util.VisibilitySet;
 import meldexun.nothirium.util.collection.Enum2ObjMap;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.Frustum;
-import meldexun.renderlib.util.memory.UnsafeByteBuffer;
 
 public abstract class AbstractRenderChunk implements IRenderChunk {
 

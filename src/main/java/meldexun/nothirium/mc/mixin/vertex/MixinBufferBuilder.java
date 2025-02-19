@@ -10,11 +10,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import meldexun.matrixutil.MemoryUtil;
+import meldexun.memoryutil.NIOBufferUtil;
 import meldexun.nothirium.mc.vertex.ExtendedBufferBuilder;
 import meldexun.nothirium.mc.vertex.ExtendedVertexFormatElement;
 import meldexun.nothirium.util.VertexSortUtil;
-import meldexun.renderlib.util.memory.NIOBufferUtil;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
@@ -46,13 +45,13 @@ public abstract class MixinBufferBuilder implements ExtendedBufferBuilder {
 
 	@ModifyVariable(method = "<init>", at = @At("RETURN"), index = 1, ordinal = 0, name = "bufferSizeIn")
 	private int init(int bufferSizeIn) {
-		address = MemoryUtil.getAddress(byteBuffer);
+		address = NIOBufferUtil.getAddress(byteBuffer);
 		return bufferSizeIn;
 	}
 
 	@ModifyVariable(method = "growBuffer", at = @At(value = "INVOKE", target = "Ljava/nio/ShortBuffer;position(I)Ljava/nio/Buffer;", shift = Shift.AFTER), index = 1, ordinal = 0, name = "increaseAmount")
 	private int growBuffer(int increaseAmount) {
-		address = MemoryUtil.getAddress(byteBuffer);
+		address = NIOBufferUtil.getAddress(byteBuffer);
 		return increaseAmount;
 	}
 

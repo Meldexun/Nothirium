@@ -3,10 +3,10 @@ package meldexun.nothirium.mc.util;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import meldexun.memoryutil.MemoryAccess;
 import meldexun.nothirium.util.math.MathUtil;
 import meldexun.renderlib.util.GLShader;
 import meldexun.renderlib.util.GLUtil;
-import meldexun.renderlib.util.memory.MemoryAccess;
 
 public class FogUtil {
 

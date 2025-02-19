@@ -6,8 +6,8 @@ import java.util.stream.IntStream;
 import it.unimi.dsi.fastutil.ints.IntArrays;
 import it.unimi.dsi.fastutil.ints.IntComparator;
 import it.unimi.dsi.fastutil.ints.IntComparators;
-import meldexun.renderlib.util.memory.MemoryAccess;
-import meldexun.renderlib.util.memory.UnsafeBufferUtil;
+import meldexun.memoryutil.MemoryAccess;
+import meldexun.memoryutil.UnsafeBufferUtil;
 
 public class VertexSortUtil {
 

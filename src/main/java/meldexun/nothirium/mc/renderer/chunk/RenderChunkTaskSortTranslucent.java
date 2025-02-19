@@ -2,13 +2,13 @@ package meldexun.nothirium.mc.renderer.chunk;
 
 import org.lwjgl.opengl.GL15;
 
+import meldexun.memoryutil.UnsafeByteBuffer;
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
 import meldexun.nothirium.util.VertexSortUtil;
-import meldexun.renderlib.util.memory.UnsafeByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;

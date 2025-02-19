@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import org.lwjgl.opengl.GL11;
 
+import meldexun.memoryutil.NIOBufferUtil;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
@@ -21,7 +22,6 @@ import meldexun.nothirium.util.Direction;
 import meldexun.nothirium.util.VertexSortUtil;
 import meldexun.nothirium.util.VisibilityGraph;
 import meldexun.nothirium.util.VisibilitySet;
-import meldexun.renderlib.util.memory.NIOBufferUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
