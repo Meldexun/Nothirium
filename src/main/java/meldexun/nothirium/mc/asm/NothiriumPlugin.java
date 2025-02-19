@@ -1,11 +1,15 @@
 package meldexun.nothirium.mc.asm;
 
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
+import net.minecraft.launchwrapper.ITweaker;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.CoreModManager;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
@@ -13,9 +17,27 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 @IFMLLoadingPlugin.TransformerExclusions("meldexun.nothirium.mc.asm")
 public class NothiriumPlugin implements IFMLLoadingPlugin {
 
+	@SuppressWarnings("unchecked")
+	public NothiriumPlugin() {
+		try {
+			Field _deobfuscatedEnvironment = CoreModManager.class.getDeclaredField("deobfuscatedEnvironment");
+			_deobfuscatedEnvironment.setAccessible(true);
+			if (_deobfuscatedEnvironment.getBoolean(null)) {
+				((List<String>) Launch.blackboard.get("TweakClasses")).add(NothiriumTweaker.class.getName());
+			} else {
+				((List<ITweaker>) Launch.blackboard.get("Tweaks")).add(new NothiriumTweaker());
+			}
+			Field _tweakSorting = CoreModManager.class.getDeclaredField("tweakSorting");
+			_tweakSorting.setAccessible(true);
+			((Map<String, Integer>) _tweakSorting.get(null)).put(NothiriumTweaker.class.getName(), 1001);
+		} catch (ReflectiveOperationException e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
+
 	@Override
 	public String[] getASMTransformerClass() {
-		return new String[] { "meldexun.nothirium.mc.asm.NothiriumClassTransformer" };
+		return null;
 	}
 
 	@Override
