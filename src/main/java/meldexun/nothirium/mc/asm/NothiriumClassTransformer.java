@@ -57,7 +57,7 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 			AbstractInsnNode popNode1 = ASMUtil.next(methodNode, targetNode1).opcode(Opcodes.INVOKESPECIAL).methodInsn("net/minecraft/client/renderer/chunk/ChunkRenderDispatcher", "<init>", "()V").find(); 
 			popNode1 = ASMUtil.next(methodNode, popNode1).type(LabelNode.class).find();
 
-			AbstractInsnNode targetNode2 = ASMUtil.next(methodNode, popNode1).opcode(Opcodes.INVOKESPECIAL).methodInsnObf("net/minecraft/client/renderer/RenderGlobal", "generateSky2", "func_174964_o", "()V").find();
+			AbstractInsnNode targetNode2 = ASMUtil.next(methodNode, popNode1).methodInsnObf("net/minecraft/client/renderer/RenderGlobal", "generateSky2", "func_174964_o", "()V").find();
 			targetNode2 = ASMUtil.next(methodNode, targetNode2).type(LabelNode.class).find();
 			AbstractInsnNode popNode2 = ASMUtil.last(methodNode).opcode(Opcodes.PUTFIELD).fieldInsnObf("net/minecraft/client/renderer/RenderGlobal", "renderEntitiesStartupCounter", "field_72740_G", "I").find(); 
 			popNode2 = ASMUtil.next(methodNode, popNode2).type(LabelNode.class).find();
