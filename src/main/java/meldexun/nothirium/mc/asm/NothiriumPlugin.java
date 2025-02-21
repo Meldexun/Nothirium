@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.fml.common.launcher.FMLInjectionAndSortingTweaker;
 import net.minecraftforge.fml.relauncher.CoreModManager;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
@@ -20,9 +21,7 @@ public class NothiriumPlugin implements IFMLLoadingPlugin {
 	@SuppressWarnings("unchecked")
 	public NothiriumPlugin() {
 		try {
-			Field _deobfuscatedEnvironment = CoreModManager.class.getDeclaredField("deobfuscatedEnvironment");
-			_deobfuscatedEnvironment.setAccessible(true);
-			if (_deobfuscatedEnvironment.getBoolean(null)) {
+			if (((List<ITweaker>) Launch.blackboard.get("Tweaks")).stream().noneMatch(FMLInjectionAndSortingTweaker.class::isInstance)) {
 				((List<String>) Launch.blackboard.get("TweakClasses")).add(NothiriumTweaker.class.getName());
 			} else {
 				((List<ITweaker>) Launch.blackboard.get("Tweaks")).add(new NothiriumTweaker());
