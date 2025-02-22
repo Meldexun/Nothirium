@@ -3,6 +3,7 @@ package meldexun.nothirium.util;
 import java.util.function.Consumer;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 import meldexun.nothirium.util.SectorizedList.Sector;
@@ -59,7 +60,6 @@ public interface FreeSectorManager {
 	class AVL extends Map<Object2ObjectAVLTreeMap<Sector, Sector>> {
 
 		private static final ReflectionField<?> TREE = new ReflectionField<>(Object2ObjectAVLTreeMap.class, "tree", "tree");
-		private static final ReflectionField<Sector> KEY = new ReflectionField<>(Object2ObjectAVLTreeMap.class.getName() + "$Entry", "key", "key");
 		private static final ReflectionMethod<?> LEFT = new ReflectionMethod<>(Object2ObjectAVLTreeMap.class.getName() + "$Entry", "left", "left");
 		private static final ReflectionMethod<?> RIGHT = new ReflectionMethod<>(Object2ObjectAVLTreeMap.class.getName() + "$Entry", "right", "right");
 
@@ -74,7 +74,8 @@ public interface FreeSectorManager {
 			Sector q = null;
 			Object p = TREE.get(map);
 			while (p != null) {
-				Sector s = KEY.get(p);
+				@SuppressWarnings("unchecked")
+				Sector s = ((Object2ObjectMap.Entry<Sector, Sector>) p).getKey();
 				if (s.getSectorCount() < minSectorSize) {
 					p = RIGHT.invoke(p);
 					continue;
@@ -94,7 +95,6 @@ public interface FreeSectorManager {
 	class RB extends Map<Object2ObjectRBTreeMap<Sector, Sector>> {
 
 		private static final ReflectionField<?> TREE = new ReflectionField<>(Object2ObjectRBTreeMap.class, "tree", "tree");
-		private static final ReflectionField<Sector> KEY = new ReflectionField<>(Object2ObjectRBTreeMap.class.getName() + "$Entry", "key", "key");
 		private static final ReflectionMethod<?> LEFT = new ReflectionMethod<>(Object2ObjectRBTreeMap.class.getName() + "$Entry", "left", "left");
 		private static final ReflectionMethod<?> RIGHT = new ReflectionMethod<>(Object2ObjectRBTreeMap.class.getName() + "$Entry", "right", "right");
 
@@ -109,7 +109,8 @@ public interface FreeSectorManager {
 			Sector q = null;
 			Object p = TREE.get(map);
 			while (p != null) {
-				Sector s = KEY.get(p);
+				@SuppressWarnings("unchecked")
+				Sector s = ((Object2ObjectMap.Entry<Sector, Sector>) p).getKey();
 				if (s.getSectorCount() < minSectorSize) {
 					p = RIGHT.invoke(p);
 					continue;

@@ -2,6 +2,7 @@ package meldexun.nothirium.mc.mixin.vertex;
 
 import java.nio.ByteBuffer;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,7 +50,7 @@ public abstract class MixinBufferBuilder implements ExtendedBufferBuilder {
 		return bufferSizeIn;
 	}
 
-	@ModifyVariable(method = "growBuffer", at = @At(value = "INVOKE", target = "Ljava/nio/ShortBuffer;position(I)Ljava/nio/Buffer;", shift = Shift.AFTER), index = 1, ordinal = 0, name = "increaseAmount")
+	@ModifyVariable(method = "growBuffer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/BufferBuilder;byteBuffer:Ljava/nio/ByteBuffer;", opcode = Opcodes.PUTFIELD, shift = Shift.AFTER), index = 1, ordinal = 0, name = "increaseAmount")
 	private int growBuffer(int increaseAmount) {
 		address = NIOBufferUtil.getAddress(byteBuffer);
 		return increaseAmount;
