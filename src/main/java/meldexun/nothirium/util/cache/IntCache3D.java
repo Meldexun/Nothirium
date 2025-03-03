@@ -2,6 +2,8 @@ package meldexun.nothirium.util.cache;
 
 import java.util.function.IntFunction;
 
+import org.apache.commons.lang3.Validate;
+
 import meldexun.nothirium.util.function.IntIntIntInt2IntFunction;
 import meldexun.nothirium.util.function.ObjInt2IntFunction;
 import net.minecraft.util.math.BlockPos;
@@ -35,8 +37,31 @@ public class IntCache3D {
 		this.data = init.apply(sizeX * sizeY * sizeZ);
 	}
 
+	public IntCache3D(int startX, int startY, int startZ, int endX, int endY, int endZ, int defaultValue, int[] data) {
+		this.startX = startX;
+		this.startY = startY;
+		this.startZ = startZ;
+		this.endX = endX;
+		this.endY = endY;
+		this.endZ = endZ;
+		this.sizeX = endX - startX + 1;
+		this.sizeY = endY - startY + 1;
+		this.sizeZ = endZ - startZ + 1;
+		this.defaultValue = defaultValue;
+		this.data = data;
+		Validate.isTrue(sizeX * sizeY * sizeZ == data.length);
+	}
+
+	private int index(BlockPos pos) {
+		return index(pos.getX(), pos.getY(), pos.getZ());
+	}
+
 	private int index(int x, int y, int z) {
 		return ((x - startX) * sizeY + y - startY) * sizeZ + z - startZ;
+	}
+
+	public boolean inBounds(BlockPos pos) {
+		return inBounds(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	public boolean inBounds(int x, int y, int z) {
@@ -72,7 +97,13 @@ public class IntCache3D {
 	}
 
 	public int compute(BlockPos pos, ObjInt2IntFunction<BlockPos> mappingFunction) {
-		return compute(pos.getX(), pos.getY(), pos.getZ(), (x, y, z, v) -> mappingFunction.apply(pos, v));
+		if (!inBounds(pos)) {
+			return this.defaultValue;
+		}
+		int index = index(pos);
+		int v = mappingFunction.apply(pos, data[index]);
+		data[index] = v;
+		return v;
 	}
 
 	public int compute(int x, int y, int z, IntIntIntInt2IntFunction mappingFunction) {

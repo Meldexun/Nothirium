@@ -1,5 +1,7 @@
 package meldexun.nothirium.mc.renderer.chunk;
 
+import java.util.function.Function;
+
 import javax.annotation.Nullable;
 
 import meldexun.nothirium.mc.integration.Optifine;
@@ -11,6 +13,7 @@ import meldexun.nothirium.util.cache.Cache2D;
 import meldexun.nothirium.util.cache.Cache3D;
 import meldexun.nothirium.util.cache.IntArrayCache;
 import meldexun.nothirium.util.cache.IntCache3D;
+import meldexun.nothirium.util.function.ObjInt2IntFunction;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
@@ -40,6 +43,13 @@ public class SectionRenderCache implements IBlockAccess {
 	protected IntCache3D lightCache;
 	protected Cache2D<Biome> biomeCache;
 
+	protected final Function<BlockPos, IBlockState> calculateBlockStateRef = this::calculateBlockState;
+	protected int minBlockLight;
+	protected final ObjInt2IntFunction<BlockPos> calculateCombinedLightRef = (pos, value) -> {
+		return value == -1 ? calculateCombinedLight(pos, this.minBlockLight) : value;
+	};
+	protected final Function<BlockPos, Biome> calculateBiomeRef = this::calculateBiome;
+
 	public SectionRenderCache(World world, SectionPos sectionPos) {
 		this.world = world;
 		this.sectionPos = sectionPos;
@@ -68,9 +78,9 @@ public class SectionRenderCache implements IBlockAccess {
 		int maxX = sectionPos.getBlockX() + 15;
 		int maxY = sectionPos.getBlockY() + 15;
 		int maxZ = sectionPos.getBlockZ() + 15;
-		this.blockCache = new Cache3D<>(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, Blocks.AIR.getDefaultState(), size -> BLOCK.get());
-		this.lightCache = new IntCache3D(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, 0, size -> LIGHT.get());
-		this.biomeCache = new Cache2D<>(minX - 16, minZ - 16, maxX + 16, maxZ + 16, Biomes.PLAINS, size -> BIOME.get());
+		this.blockCache = new Cache3D<>(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, Blocks.AIR.getDefaultState(), BLOCK.get());
+		this.lightCache = new IntCache3D(minX - 1, minY - 1, minZ - 1, maxX + 1, maxY + 1, maxZ + 1, 0, LIGHT.get());
+		this.biomeCache = new Cache2D<>(minX - 16, minZ - 16, maxX + 16, maxZ + 16, Biomes.PLAINS, BIOME.get());
 	}
 
 	public void freeCaches() {
@@ -98,7 +108,8 @@ public class SectionRenderCache implements IBlockAccess {
 
 	@Override
 	public int getCombinedLight(BlockPos pos, int minBlockLight) {
-		return this.lightCache.compute(pos, (p, l) -> l == -1 ? this.calculateCombinedLight(p, minBlockLight) : l);
+		this.minBlockLight = minBlockLight;
+		return this.lightCache.compute(pos, this.calculateCombinedLightRef);
 	}
 
 	private int calculateCombinedLight(BlockPos pos, int minBlockLight) {
@@ -148,11 +159,13 @@ public class SectionRenderCache implements IBlockAccess {
 
 	@Override
 	public IBlockState getBlockState(BlockPos pos) {
-		return this.blockCache.computeIfAbsent(pos, p -> {
-			ExtendedBlockStorage section = this.getSection(p);
-			return section == null ? Blocks.AIR.getDefaultState()
-					: section.get(p.getX() & 15, p.getY() & 15, p.getZ() & 15);
-		});
+		return this.blockCache.computeIfAbsent(pos, this.calculateBlockStateRef);
+	}
+
+	private IBlockState calculateBlockState(BlockPos pos) {
+		ExtendedBlockStorage section = this.getSection(pos);
+		return section == null ? Blocks.AIR.getDefaultState()
+				: section.get(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
 	}
 
 	@Override
@@ -163,10 +176,12 @@ public class SectionRenderCache implements IBlockAccess {
 
 	@Override
 	public Biome getBiome(BlockPos pos) {
-		return this.biomeCache.computeIfAbsent(pos, p -> {
-			Chunk chunk = this.getChunk(p);
-			return chunk == null ? Biomes.PLAINS : chunk.getBiome(p, this.world.getBiomeProvider());
-		});
+		return this.biomeCache.computeIfAbsent(pos, this.calculateBiomeRef);
+	}
+
+	private Biome calculateBiome(BlockPos pos) {
+		Chunk chunk = this.getChunk(pos);
+		return chunk == null ? Biomes.PLAINS : chunk.getBiome(pos, this.getWorld().getBiomeProvider());
 	}
 
 	@Override
