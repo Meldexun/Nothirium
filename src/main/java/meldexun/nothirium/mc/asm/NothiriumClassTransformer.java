@@ -20,6 +20,7 @@ import meldexun.nothirium.mc.asm.compatibility.BetterFoliageTransformer;
 import meldexun.nothirium.mc.asm.compatibility.ChunkAnimatorTransformer;
 import meldexun.nothirium.mc.asm.compatibility.CubicChunksTransformer;
 import meldexun.nothirium.mc.asm.compatibility.FluidloggedAPITransformer;
+import meldexun.nothirium.mc.asm.compatibility.OptifineTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
@@ -84,6 +85,9 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 		}
 		if (doesClassExist("git.jbredwards.fluidlogged_api.mod.asm.ASMHandler")) {
 			FluidloggedAPITransformer.registerTransformers(registry);
+		}
+		if (doesClassExist("optifine.OptiFineClassTransformer")) {
+			OptifineTransformer.registerTransformers(registry);
 		}
 		if (doesClassExist("mods.betterfoliage.loader.BetterFoliageLoader")) {
 			BetterFoliageTransformer.registerTransformers(registry);

@@ -8,7 +8,6 @@ import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkProvider;
 import meldexun.nothirium.mc.config.NothiriumConfig;
 import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
-import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL15;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL20;
 import meldexun.nothirium.mc.renderer.chunk.ChunkRendererGL42;
@@ -41,11 +40,7 @@ public class ChunkRenderManager {
 	}
 
 	public static void allChanged() {
-		if (Optifine.OPTIFINE_DETECTED) {
-			chunkRenderer = Optifine.createChunkRenderer(chunkRenderer);
-		} else {
-			chunkRenderer = createChunkRenderer(chunkRenderer);
-		}
+		chunkRenderer = createChunkRenderer(chunkRenderer);
 		if (renderChunkProvider != null) {
 			renderChunkProvider.releaseBuffers();
 		} else {

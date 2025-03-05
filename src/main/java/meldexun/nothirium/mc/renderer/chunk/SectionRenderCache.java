@@ -4,7 +4,6 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import meldexun.nothirium.mc.integration.Optifine;
 import meldexun.nothirium.mc.util.WorldUtil;
 import meldexun.nothirium.mc.util.LightUtil;
 import meldexun.nothirium.util.SectionPos;
@@ -126,10 +125,6 @@ public class SectionRenderCache implements IBlockAccess {
 			light = this.getLight(mutable.setPos(pos.getX() + 1, pos.getY(), pos.getZ()), light);
 		} else {
 			light = this.getLight(pos, light);
-		}
-
-		if (Optifine.OPTIFINE_DETECTED && Optifine.IS_DYNAMIC_LIGHTS.invoke(null) && !state.isOpaqueCube()) {
-			light = Optifine.GET_COMBINED_LIGHT.invoke(null, pos, light);
 		}
 
 		return light;
