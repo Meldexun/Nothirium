@@ -16,6 +16,7 @@ import meldexun.asmutil2.HashMapClassNodeClassTransformer;
 import meldexun.asmutil2.IClassTransformerRegistry;
 import meldexun.asmutil2.NonLoadingClassWriter;
 import meldexun.asmutil2.reader.ClassUtil;
+import meldexun.nothirium.mc.asm.compatibility.BetterFoliageTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
@@ -71,7 +72,20 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 				new JumpInsnNode(Opcodes.GOTO, (LabelNode) popNode2)
 			));
 		});
+
+		if (doesClassExist("mods.betterfoliage.loader.BetterFoliageLoader")) {
+			BetterFoliageTransformer.registerTransformers(registry);
+		}
 		// @formatter:on
+	}
+
+	private static boolean doesClassExist(String className) {
+		try {
+			Class.forName(className, false, NothiriumClassTransformer.class.getClassLoader());
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
 	}
 
 	@Override
