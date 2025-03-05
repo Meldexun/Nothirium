@@ -176,12 +176,12 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 		}
 
 		for (Direction dir : Direction.ALL) {
-			if (blockState.doesSideBlockRendering(chunkCache, pos, EnumFacingUtil.getFacing(dir))) {
+			if (blockState.doesSideBlockRendering(this.chunkCache, pos, EnumFacingUtil.getFacing(dir))) {
 				visibilityGraph.setOpaque(pos.getX(), pos.getY(), pos.getZ(), dir);
 			}
 		}
 
-		// I will just quote another mod here "This is a ridiculously hacky workaround, I would not recommend it to anyone."
+		// ImmersivePetroleum: "This is a ridiculously hacky workaround, I would not recommend it to anyone."
 		blockState.getBlock().hasTileEntity(blockState);
 
 		for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
