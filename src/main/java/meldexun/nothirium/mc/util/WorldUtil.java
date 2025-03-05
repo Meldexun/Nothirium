@@ -1,7 +1,5 @@
 package meldexun.nothirium.mc.util;
 
-import meldexun.nothirium.mc.Nothirium;
-import meldexun.nothirium.mc.integration.CubicChunks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -50,9 +48,6 @@ public class WorldUtil {
 	}
 
 	public static boolean isSectionLoaded(World world, int sectionX, int sectionY, int sectionZ) {
-		if (Nothirium.isCubicChunksInstalled && CubicChunks.isCubicWorld(world)) {
-			return CubicChunks.isSectionLoaded(world, sectionX, sectionY, sectionZ);
-		}
 		return isChunkLoaded(world, sectionX, sectionZ);
 	}
 
@@ -61,9 +56,6 @@ public class WorldUtil {
 	}
 
 	public static ExtendedBlockStorage getSection(World world, int sectionX, int sectionY, int sectionZ) {
-		if (Nothirium.isCubicChunksInstalled && CubicChunks.isCubicWorld(world)) {
-			return CubicChunks.getSection(world, sectionX, sectionY, sectionZ);
-		}
 		if (sectionY < 0 || sectionY >= 16) {
 			return null;
 		}

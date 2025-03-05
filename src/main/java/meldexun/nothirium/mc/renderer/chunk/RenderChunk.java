@@ -6,8 +6,6 @@ import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
-import meldexun.nothirium.mc.Nothirium;
-import meldexun.nothirium.mc.integration.CubicChunks;
 import meldexun.nothirium.mc.util.WorldUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -20,8 +18,7 @@ public class RenderChunk extends AbstractRenderChunk {
 
 	@Override
 	public void markDirty() {
-		if ((!Nothirium.isCubicChunksInstalled || !CubicChunks.isCubicWorld())
-				&& (this.getSectionY() < 0 || this.getSectionY() >= 16)) {
+		if (this.getSectionY() < 0 || this.getSectionY() >= 16) {
 			this.getVisibility().setAllVisible();
 			return;
 		}
@@ -50,10 +47,6 @@ public class RenderChunk extends AbstractRenderChunk {
 
 	@Override
 	protected boolean canCompile() {
-		if (Nothirium.isCubicChunksInstalled && CubicChunks.isCubicWorld()) {
-			return CubicChunks.canCompile(this);
-		}
-
 		for (int x = this.getSectionX() - 1; x <= this.getSectionX() + 1; x++) {
 			for (int z = this.getSectionZ() - 1; z <= this.getSectionZ() + 1; z++) {
 				if (!WorldUtil.isChunkLoaded(x, z))
