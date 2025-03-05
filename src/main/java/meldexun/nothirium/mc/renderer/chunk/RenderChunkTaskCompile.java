@@ -12,8 +12,6 @@ import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.api.renderer.chunk.IChunkRenderer;
 import meldexun.nothirium.api.renderer.chunk.IRenderChunkDispatcher;
 import meldexun.nothirium.api.renderer.chunk.RenderChunkTaskResult;
-import meldexun.nothirium.mc.Nothirium;
-import meldexun.nothirium.mc.integration.FluidloggedAPI;
 import meldexun.nothirium.mc.util.BlockRenderLayerUtil;
 import meldexun.nothirium.mc.util.EnumFacingUtil;
 import meldexun.nothirium.renderer.chunk.AbstractRenderChunkTask;
@@ -29,6 +27,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
@@ -107,11 +106,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 				for (int z = 0; z < 16; z++) {
 					pos.setPos(this.renderChunk.getX() + x, this.renderChunk.getY() + y, this.renderChunk.getZ() + z);
 					IBlockState blockState = this.chunkCache.getBlockState(pos);
-					renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack, mc);
-
-					if (Nothirium.isFluidloggedAPIInstalled) {
-						FluidloggedAPI.renderFluidState(blockState, this.chunkCache, pos, fluidState -> renderBlockState(fluidState, pos, visibilityGraph, bufferBuilderPack, mc));
-					}
+					renderBlockState(blockState, pos, visibilityGraph, bufferBuilderPack);
 				}
 			}
 
@@ -175,7 +170,7 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 		return RenderChunkTaskResult.SUCCESSFUL;
 	}
 
-	private void renderBlockState(IBlockState blockState, MutableBlockPos pos, VisibilityGraph visibilityGraph, RegionRenderCacheBuilder bufferBuilderPack, Minecraft mc) {
+	public void renderBlockState(IBlockState blockState, BlockPos pos, VisibilityGraph visibilityGraph, RegionRenderCacheBuilder bufferBuilderPack) {
 		if (blockState.getRenderType() == EnumBlockRenderType.INVISIBLE) {
 			return;
 		}

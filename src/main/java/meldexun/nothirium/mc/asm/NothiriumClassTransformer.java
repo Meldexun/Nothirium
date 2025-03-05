@@ -18,6 +18,7 @@ import meldexun.asmutil2.NonLoadingClassWriter;
 import meldexun.asmutil2.reader.ClassUtil;
 import meldexun.nothirium.mc.asm.compatibility.BetterFoliageTransformer;
 import meldexun.nothirium.mc.asm.compatibility.ChunkAnimatorTransformer;
+import meldexun.nothirium.mc.asm.compatibility.FluidloggedAPITransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
@@ -76,6 +77,9 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 
 		if (doesClassExist("lumien.chunkanimator.asm.LoadingPlugin")) {
 			ChunkAnimatorTransformer.registerTransformers(registry);
+		}
+		if (doesClassExist("git.jbredwards.fluidlogged_api.mod.asm.ASMHandler")) {
+			FluidloggedAPITransformer.registerTransformers(registry);
 		}
 		if (doesClassExist("mods.betterfoliage.loader.BetterFoliageLoader")) {
 			BetterFoliageTransformer.registerTransformers(registry);

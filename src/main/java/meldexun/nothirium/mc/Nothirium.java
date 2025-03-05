@@ -22,7 +22,6 @@ public class Nothirium {
 
 	public static final String MODID = "nothirium";
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
-	public static boolean isFluidloggedAPIInstalled;
 	public static boolean isCubicChunksInstalled;
 
 	@EventHandler
@@ -32,7 +31,6 @@ public class Nothirium {
 
 	@EventHandler
 	public void onFMLPostInitializationEvent(FMLPostInitializationEvent event) {
-		isFluidloggedAPIInstalled = Loader.isModLoaded("fluidlogged_api");
 		isCubicChunksInstalled = Loader.isModLoaded("cubicchunks");
 	}
 
