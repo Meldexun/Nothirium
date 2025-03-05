@@ -3,13 +3,10 @@ package meldexun.nothirium.mc.renderer.chunk;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.util.vector.Vector3f;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
-import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
-import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.util.ListUtil;
 import meldexun.renderlib.util.RenderUtil;
 
@@ -66,12 +63,6 @@ public class ChunkRendererGL15 extends ChunkRendererDynamicVbo {
 	}
 
 	protected void draw(RenderChunk renderChunk, ChunkRenderPass pass, double cameraX, double cameraY, double cameraZ) {
-		if (Nothirium.isChunkAnimatorInstalled) {
-			Vector3f offset = ChunkAnimator.getOffset(renderChunk);
-			cameraX -= offset.x;
-			cameraY -= offset.y;
-			cameraZ -= offset.z;
-		}
 		IVBOPart vboPart = renderChunk.getVBOPart(pass);
 		GL11.glPushMatrix();
 		GL11.glTranslated(renderChunk.getX() - cameraX, renderChunk.getY() - cameraY, renderChunk.getZ() - cameraZ);

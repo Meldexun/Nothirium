@@ -3,14 +3,12 @@ package meldexun.nothirium.mc.renderer.chunk;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.util.vector.Vector3f;
 
 import meldexun.matrixutil.Matrix4f;
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.api.renderer.chunk.ChunkRenderPass;
 import meldexun.nothirium.mc.Nothirium;
 import meldexun.nothirium.mc.config.NothiriumConfig.RenderEngine;
-import meldexun.nothirium.mc.integration.ChunkAnimator;
 import meldexun.nothirium.mc.util.FogUtil;
 import meldexun.nothirium.mc.util.ResourceSupplier;
 import meldexun.nothirium.util.ListUtil;
@@ -95,12 +93,6 @@ public class ChunkRendererGL20 extends ChunkRendererDynamicVbo {
 	}
 
 	protected void draw(RenderChunk renderChunk, ChunkRenderPass pass, double cameraX, double cameraY, double cameraZ) {
-		if (Nothirium.isChunkAnimatorInstalled) {
-			Vector3f offset = ChunkAnimator.getOffset(renderChunk);
-			cameraX -= offset.x;
-			cameraY -= offset.y;
-			cameraZ -= offset.z;
-		}
 		GL20.glVertexAttrib3f(shader.getAttribute(A_OFFSET), (float) (renderChunk.getX() - cameraX), (float) (renderChunk.getY() - cameraY), (float) (renderChunk.getZ() - cameraZ));
 		IVBOPart vboPart = renderChunk.getVBOPart(pass);
 		GL11.glDrawArrays(GL11.GL_QUADS, vboPart.getFirst(), vboPart.getCount());
