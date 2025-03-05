@@ -17,6 +17,11 @@ import meldexun.asmutil2.IClassTransformerRegistry;
 public class ChunkAnimatorTransformer {
 
 	public static void registerTransformers(IClassTransformerRegistry registry) {
+		registry.add("meldexun.nothirium.renderer.chunk.AbstractRenderChunk", "<init>", 0, method -> {
+			method.instructions.insert(ASMUtil.first(method).methodInsn("markDirty").find(), ASMUtil.listOf(
+					new VarInsnNode(Opcodes.ALOAD, 0),
+					new MethodInsnNode(Opcodes.INVOKESTATIC, "meldexun/nothirium/mc/integration/ChunkAnimator", "onSetCoords", "(Lmeldexun/nothirium/api/renderer/chunk/IRenderChunk;)V", false)));
+		});
 		registry.add("meldexun.nothirium.renderer.chunk.AbstractRenderChunk", "setCoords", 0, method -> {
 			method.instructions.insert(ASMUtil.first(method).methodInsn("markDirty").find(), ASMUtil.listOf(
 					new VarInsnNode(Opcodes.ALOAD, 0),
