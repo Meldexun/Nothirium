@@ -97,6 +97,9 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 			));
 		});
 
+		if (doesClassExist("mods.betterfoliage.loader.BetterFoliageLoader")) {
+			BetterFoliageTransformer.registerTransformers(registry);
+		}
 		if (doesClassExist("lumien.chunkanimator.asm.LoadingPlugin")) {
 			ChunkAnimatorTransformer.registerTransformers(registry);
 		}
@@ -111,9 +114,6 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 		}
 		if (doesClassExist("optifine.OptiFineClassTransformer")) {
 			OptifineTransformer.registerTransformers(registry);
-		}
-		if (doesClassExist("mods.betterfoliage.loader.BetterFoliageLoader")) {
-			BetterFoliageTransformer.registerTransformers(registry);
 		}
 		// @formatter:on
 	}
