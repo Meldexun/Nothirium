@@ -181,9 +181,6 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 			}
 		}
 
-		// ImmersivePetroleum: "This is a ridiculously hacky workaround, I would not recommend it to anyone."
-		blockState.getBlock().hasTileEntity(blockState);
-
 		for (BlockRenderLayer layer : BlockRenderLayerUtil.ALL) {
 			if (!blockState.getBlock().canRenderInLayer(blockState, layer)) {
 				continue;

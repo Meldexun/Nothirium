@@ -31,6 +31,7 @@ import meldexun.nothirium.mc.asm.compatibility.BetterFoliageTransformer;
 import meldexun.nothirium.mc.asm.compatibility.ChunkAnimatorTransformer;
 import meldexun.nothirium.mc.asm.compatibility.CubicChunksTransformer;
 import meldexun.nothirium.mc.asm.compatibility.FluidloggedAPITransformer;
+import meldexun.nothirium.mc.asm.compatibility.ImmersivePetroleumTransformer;
 import meldexun.nothirium.mc.asm.compatibility.MultiblockedTransformer;
 import meldexun.nothirium.mc.asm.compatibility.OptifineTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -152,6 +153,9 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 		}
 		if (doesClassExist.test("git.jbredwards.fluidlogged_api.mod.asm.ASMHandler")) {
 			FluidloggedAPITransformer.registerTransformers(registry);
+		}
+		if (doesClassExist.test("flaxbeard.immersivepetroleum.ImmersivePetroleum")) {
+			ImmersivePetroleumTransformer.registerTransformers(registry);
 		}
 		if (doesClassExist.test("com.cleanroommc.multiblocked.core.MultiblockedLoadingPlugin")) {
 			MultiblockedTransformer.registerTransformers(registry);
