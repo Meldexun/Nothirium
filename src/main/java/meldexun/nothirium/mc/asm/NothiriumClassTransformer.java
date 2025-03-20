@@ -1,9 +1,17 @@
 package meldexun.nothirium.mc.asm;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.zip.ZipFile;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -96,34 +104,75 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 				new JumpInsnNode(Opcodes.GOTO, (LabelNode) popNode2)
 			));
 		});
+		// @formatter:on
 
-		if (doesClassExist("mods.betterfoliage.loader.BetterFoliageLoader")) {
+		Map<Path, ZipFile> zipCache = new HashMap<>();
+		Predicate<String> doesClassExist = className -> {
+			className = className.replace('.', '/') + ".class";
+
+			if (Launch.classLoader.getResource(className) != null) {
+				return true;
+			}
+
+			try {
+				String s = className;
+				return Files.list(Paths.get("./mods"))
+						.filter(Files::isRegularFile)
+						.filter(p -> p.getFileName().toString().endsWith(".jar"))
+						.map(p -> {
+							if (zipCache.containsKey(p)) {
+								return zipCache.get(p);
+							}
+							ZipFile zip;
+							try {
+								zip = new ZipFile(p.toFile());
+							} catch (IOException e) {
+								zip = null;
+							}
+							zipCache.put(p, zip);
+							return zip;
+						})
+						.filter(Objects::nonNull)
+						.map(zip -> zip.getEntry(s))
+						.anyMatch(Objects::nonNull);
+			} catch (IOException e) {
+				// ignore
+			}
+
+			return false;
+		};
+		if (doesClassExist.test("mods.betterfoliage.loader.BetterFoliageLoader")) {
 			BetterFoliageTransformer.registerTransformers(registry);
 		}
-		if (doesClassExist("lumien.chunkanimator.asm.LoadingPlugin")) {
+		if (doesClassExist.test("lumien.chunkanimator.asm.LoadingPlugin")) {
 			ChunkAnimatorTransformer.registerTransformers(registry);
 		}
-		if (doesClassExist("io.github.opencubicchunks.cubicchunks.core.asm.coremod.CubicChunksCoreMod")) {
+		if (doesClassExist.test("io.github.opencubicchunks.cubicchunks.core.asm.coremod.CubicChunksCoreMod")) {
 			CubicChunksTransformer.registerTransformers(registry);
 		}
-		if (doesClassExist("git.jbredwards.fluidlogged_api.mod.asm.ASMHandler")) {
+		if (doesClassExist.test("git.jbredwards.fluidlogged_api.mod.asm.ASMHandler")) {
 			FluidloggedAPITransformer.registerTransformers(registry);
 		}
-		if (doesClassExist("com.cleanroommc.multiblocked.core.MultiblockedLoadingPlugin")) {
+		if (doesClassExist.test("com.cleanroommc.multiblocked.core.MultiblockedLoadingPlugin")) {
 			MultiblockedTransformer.registerTransformers(registry);
 		}
-		if (doesClassExist("optifine.OptiFineClassTransformer")) {
+		if (doesClassExist.test("optifine.OptiFineClassTransformer")) {
 			OptifineTransformer.registerTransformers(registry);
 		}
-		// @formatter:on
-	}
-
-	private static boolean doesClassExist(String className) {
-		try {
-			Class.forName(className, false, NothiriumClassTransformer.class.getClassLoader());
-			return true;
-		} catch (ClassNotFoundException e) {
-			return false;
+		IOException e = null;
+		for (ZipFile zip : zipCache.values()) {
+			try {
+				zip.close();
+			} catch (IOException e1) {
+				if (e == null) {
+					e = e1;
+				} else {
+					e.addSuppressed(e1);
+				}
+			}
+		}
+		if (e != null) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
