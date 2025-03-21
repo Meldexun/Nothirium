@@ -11,6 +11,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import meldexun.asmutil2.ASMUtil;
 import meldexun.asmutil2.IClassTransformerRegistry;
+import meldexun.nothirium.mc.asm.NothiriumClassTransformer;
 
 public class OptifineTransformer {
 
@@ -48,7 +49,7 @@ public class OptifineTransformer {
 					new MethodInsnNode(Opcodes.INVOKESTATIC, "Config", "isDynamicLights", "()Z", false),
 					new JumpInsnNode(Opcodes.IFEQ, label),
 					new VarInsnNode(Opcodes.ALOAD, ASMUtil.findLocalVariable(method, "state", "Lnet/minecraft/block/state/IBlockState;").index),
-					new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/block/state/IBlockState", "isOpaqueCube", "()Z", false),
+					NothiriumClassTransformer.createObfMethodInsn(Opcodes.INVOKEINTERFACE, "net/minecraft/block/state/IBlockState", "func_185914_p", "()Z", true),
 					new JumpInsnNode(Opcodes.IFNE, label),
 					new VarInsnNode(Opcodes.ALOAD, ASMUtil.findLocalVariable(method, "pos", "Lnet/minecraft/util/math/BlockPos;").index),
 					new VarInsnNode(Opcodes.ILOAD, ASMUtil.findLocalVariable(method, "light", "I").index),

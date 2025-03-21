@@ -15,6 +15,7 @@ import java.util.zip.ZipFile;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -35,6 +36,7 @@ import meldexun.nothirium.mc.asm.compatibility.MultiblockedTransformer;
 import meldexun.nothirium.mc.asm.compatibility.OptifineTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer implements IClassTransformer {
 
@@ -168,6 +170,14 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 	@Override
 	protected ClassWriter createClassWriter(int flags) {
 		return new NonLoadingClassWriter(flags, REMAPPING_CLASS_UTIL);
+	}
+
+	public static FieldInsnNode createObfFieldInsn(int opcode, String owner, String name, String desc) {
+		return new FieldInsnNode(opcode, owner, FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(owner, name, desc), desc);
+	}
+
+	public static MethodInsnNode createObfMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+		return new MethodInsnNode(opcode, owner, FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc), desc, itf);
 	}
 
 }
