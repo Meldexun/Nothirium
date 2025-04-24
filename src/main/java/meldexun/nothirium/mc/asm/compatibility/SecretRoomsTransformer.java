@@ -13,6 +13,7 @@ public class SecretRoomsTransformer {
 			MethodInsnNode getBlockState = ASMUtil.first(method).methodInsnObf("getBlockState", "func_180495_p").find();
 			getBlockState.setOpcode(Opcodes.INVOKESTATIC);
 			getBlockState.owner = "com/wynprice/secretroomsmod/core/SecretRoomsHooksClient";
+			getBlockState.name = "getBlockState";
 			getBlockState.desc = "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;";
 			getBlockState.itf = false;
 		});
