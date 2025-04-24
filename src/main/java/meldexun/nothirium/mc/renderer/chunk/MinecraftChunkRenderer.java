@@ -16,12 +16,15 @@ public abstract class MinecraftChunkRenderer extends AbstractChunkRenderer<Rende
 	@Override
 	public final void render(ChunkRenderPass pass) {
 		RenderHelper.disableStandardItemLighting();
-		Minecraft.getMinecraft().entityRenderer.enableLightmap();
 
-		this.renderChunks(pass);
-
-		GlStateManager.resetColor();
-		Minecraft.getMinecraft().entityRenderer.disableLightmap();
+		if (!this.chunks.get(pass).isEmpty()) {
+			Minecraft.getMinecraft().entityRenderer.enableLightmap();
+	
+			this.renderChunks(pass);
+	
+			GlStateManager.resetColor();
+			Minecraft.getMinecraft().entityRenderer.disableLightmap();
+		}
 	}
 
 	protected abstract void renderChunks(ChunkRenderPass pass);
