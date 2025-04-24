@@ -34,6 +34,7 @@ import meldexun.nothirium.mc.asm.compatibility.FluidloggedAPITransformer;
 import meldexun.nothirium.mc.asm.compatibility.ImmersivePetroleumTransformer;
 import meldexun.nothirium.mc.asm.compatibility.MultiblockedTransformer;
 import meldexun.nothirium.mc.asm.compatibility.OptifineTransformer;
+import meldexun.nothirium.mc.asm.compatibility.SecretRoomsTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
@@ -149,6 +150,9 @@ public class NothiriumClassTransformer extends HashMapClassNodeClassTransformer 
 		}
 		if (doesClassExist.test("optifine.OptiFineClassTransformer")) {
 			OptifineTransformer.registerTransformers(registry);
+		}
+		if (doesClassExist.test("com.wynprice.secretroomsmod.core.SecretRoomsCore")) {
+			SecretRoomsTransformer.registerTransformers(registry);
 		}
 		IOException e = null;
 		for (ZipFile zip : zipCache.values()) {
