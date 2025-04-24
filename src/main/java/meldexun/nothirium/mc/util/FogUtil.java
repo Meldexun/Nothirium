@@ -51,6 +51,9 @@ public class FogUtil {
 	}
 
 	public static double calculateFogEndSqr() {
+		if (!GL11.glGetBoolean(GL11.GL_FOG)) {
+			return Double.MAX_VALUE;
+		}
 		int fogMode = GL11.glGetInteger(GL11.GL_FOG_MODE);
 		if (fogMode == GL11.GL_LINEAR) {
 			return MathUtil.square(GL11.glGetFloat(GL11.GL_FOG_END));
