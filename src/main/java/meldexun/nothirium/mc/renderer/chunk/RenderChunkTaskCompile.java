@@ -3,7 +3,6 @@ package meldexun.nothirium.mc.renderer.chunk;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.IntStream;
 
 import org.lwjgl.opengl.GL11;
 
@@ -36,10 +35,6 @@ import net.minecraftforge.client.ForgeHooksClient;
 public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk> {
 
 	private static final BlockingQueue<RegionRenderCacheBuilder> BUFFER_QUEUE = new LinkedBlockingQueue<>();
-	static {
-		IntStream.range(0, (Runtime.getRuntime().availableProcessors() - 2) * 2).mapToObj(i -> new RegionRenderCacheBuilder()).forEach(BUFFER_QUEUE::add);
-	}
-
 	private final IBlockAccess chunkCache;
 
 	public RenderChunkTaskCompile(IChunkRenderer<?> chunkRenderer, IRenderChunkDispatcher taskDispatcher, RenderChunk renderChunk, IBlockAccess chunkCache) {
@@ -74,17 +69,16 @@ public class RenderChunkTaskCompile extends AbstractRenderChunkTask<RenderChunk>
 	}
 
 	private RenderChunkTaskResult compileSection() {
-		RegionRenderCacheBuilder bufferBuilderPack = null;
-		boolean freeBufferBuilderPack = true;
+		RegionRenderCacheBuilder bufferBuilderPack = BUFFER_QUEUE.poll();
+		if (bufferBuilderPack == null) {
+			bufferBuilderPack = new RegionRenderCacheBuilder();
+		}
 
+		boolean freeBufferBuilderPack = true;
 		try {
-			bufferBuilderPack = BUFFER_QUEUE.take();
 			freeBufferBuilderPack = compileSection(bufferBuilderPack) != RenderChunkTaskResult.SUCCESSFUL;
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			return RenderChunkTaskResult.CANCELLED;
 		} finally {
-			if (bufferBuilderPack != null && freeBufferBuilderPack) {
+			if (freeBufferBuilderPack) {
 				freeBuffer(bufferBuilderPack);
 			}
 		}
