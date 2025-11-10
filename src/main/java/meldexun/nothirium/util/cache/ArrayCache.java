@@ -28,7 +28,7 @@ public class ArrayCache<T> {
 
 	public void free(T[] t) {
 		Arrays.fill(t, filler);
-		cache.offer(t);
+		cache.add(t);
 	}
 
 }

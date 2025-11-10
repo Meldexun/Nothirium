@@ -1,12 +1,12 @@
 package meldexun.nothirium.util.cache;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class IntArrayCache {
 
-	private final Queue<int[]> cache = new LinkedList<>();
+	private final Queue<int[]> cache = new ConcurrentLinkedQueue<>();
 	private final int arraySize;
 	private final int filler;
 
@@ -16,10 +16,7 @@ public class IntArrayCache {
 	}
 
 	public int[] get() {
-		int[] a;
-		synchronized (this) {
-			a = cache.poll();
-		}
+		int[] a = cache.poll();
 		if (a == null) {
 			Arrays.fill((a = new int[arraySize]), filler);
 		}
@@ -28,9 +25,7 @@ public class IntArrayCache {
 
 	public void free(int[] a) {
 		Arrays.fill(a, filler);
-		synchronized (this) {
-			cache.add(a);
-		}
+		cache.add(a);
 	}
 
 }
