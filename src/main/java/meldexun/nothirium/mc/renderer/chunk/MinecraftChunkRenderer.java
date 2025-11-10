@@ -14,7 +14,7 @@ public abstract class MinecraftChunkRenderer extends AbstractChunkRenderer<Rende
 	public abstract RenderEngine getRenderEngine();
 
 	@Override
-	public final void render(ChunkRenderPass pass) {
+	public void render(ChunkRenderPass pass) {
 		RenderHelper.disableStandardItemLighting();
 
 		if (!this.chunks.get(pass).isEmpty()) {

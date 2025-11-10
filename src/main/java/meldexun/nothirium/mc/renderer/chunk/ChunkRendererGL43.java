@@ -175,17 +175,25 @@ public class ChunkRendererGL43 extends ChunkRendererDynamicVbo {
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, commandBuffers.get().get(pass).getBuffer());
 
 		GL43.glMultiDrawArraysIndirect(GL11.GL_QUADS, 0, chunks.get(pass).size(), 0);
-		if (pass == ChunkRenderPass.TRANSLUCENT) {
-			if (syncs.getInt() != -1)
-				GL15.glDeleteQueries(syncs.getInt());
-			int query = GL15.glGenQueries();
-			GL33.glQueryCounter(query, GL33.GL_TIMESTAMP);
-			syncs.set(query);
-		}
 
 		GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, 0);
 		GL30.glBindVertexArray(0);
 		GLShader.pop();
+	}
+
+	@Override
+	public void render(ChunkRenderPass pass) {
+		try {
+			super.render(pass);
+		} finally {
+			if (pass == ChunkRenderPass.TRANSLUCENT) {
+				if (syncs.getInt() != -1)
+					GL15.glDeleteQueries(syncs.getInt());
+				int query = GL15.glGenQueries();
+				GL33.glQueryCounter(query, GL33.GL_TIMESTAMP);
+				syncs.set(query);
+			}
+		}
 	}
 
 	@Override
