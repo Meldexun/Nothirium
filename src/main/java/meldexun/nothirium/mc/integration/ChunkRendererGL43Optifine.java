@@ -20,6 +20,9 @@ public class ChunkRendererGL43Optifine extends ChunkRendererGL43 {
 		if (Optifine.IS_DYNAMIC_LIGHTS.invoke(null)) {
 			Optifine.DYNAMIC_LIGHTS_UPDATE.invoke(null, Minecraft.getMinecraft().renderGlobal);
 		}
+		if (Optifine.IS_FOG_OFF.invoke(null) && Optifine.FOG_STANDARD.getBoolean(Minecraft.getMinecraft().entityRenderer)) {
+			GlStateManager.disableFog();
+		}
 
 		super.setup(renderChunkProvider, cameraX, cameraY, cameraZ, frustum, frame);
 	}
