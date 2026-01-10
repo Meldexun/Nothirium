@@ -77,7 +77,7 @@ public class DynamicVBO {
 	}
 
 	public VBOPart buffer(ByteBuffer data) {
-		int size = data.limit();
+		int size = data.remaining();
 		int requiredSectors = MathUtil.ceilDiv(size, this.sectorSize);
 		if (requiredSectors <= 0) {
 			throw new IllegalArgumentException();
