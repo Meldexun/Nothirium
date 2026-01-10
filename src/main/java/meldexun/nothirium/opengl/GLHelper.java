@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL44;
 import org.lwjgl.opengl.GL45;
 
+import meldexun.memoryutil.NIOBufferUtil;
 import meldexun.renderlib.util.GLUtil;
 
 public class GLHelper {
@@ -68,18 +69,13 @@ public class GLHelper {
 			GL15.glDeleteBuffers(vbo);
 			return newVbo;
 		} else {
-			int temp = GL15.glGenBuffers();
-			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, temp);
-			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, oldSize, GL15.GL_STREAM_COPY);
-			ByteBuffer tempBuffer = GL15.glMapBuffer(GL15.GL_ARRAY_BUFFER, GL15.GL_READ_WRITE, oldSize, null);
+			ByteBuffer temp = NIOBufferUtil.allocateByte(oldSize);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-			GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, tempBuffer);
+			GL15.glGetBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, temp);
 			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, newSize, GL15.GL_DYNAMIC_COPY);
-			GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, tempBuffer);
-			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, temp);
-			GL15.glUnmapBuffer(GL15.GL_ARRAY_BUFFER);
+			GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0L, temp);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-			GL15.glDeleteBuffers(temp);
+			NIOBufferUtil.freeMemory(temp);
 			return vbo;
 		}
 	}
