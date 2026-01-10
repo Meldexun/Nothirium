@@ -40,7 +40,7 @@ public class DynamicVBO {
 		};
 		this.vbo = GL15.glGenBuffers();
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, (long) sectorSize * sectorCount, GL15.GL_STREAM_DRAW);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, (long) sectorSize * sectorCount, GL15.GL_DYNAMIC_COPY);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
 
