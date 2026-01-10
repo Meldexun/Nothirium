@@ -4,12 +4,17 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.opengl.ARBBufferStorage;
+import org.lwjgl.opengl.ARBDirectStateAccess;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL44;
+import org.lwjgl.opengl.GL45;
 
 import meldexun.nothirium.api.renderer.IVBOPart;
 import meldexun.nothirium.util.SectorizedList;
 import meldexun.nothirium.util.SectorizedList.Sector;
 import meldexun.nothirium.util.math.MathUtil;
+import meldexun.renderlib.util.GLUtil;
 
 public class DynamicVBO {
 
@@ -38,10 +43,29 @@ public class DynamicVBO {
 				}
 			}
 		};
-		this.vbo = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, (long) sectorSize * sectorCount, GL15.GL_DYNAMIC_COPY);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		long size = (long) sectorSize * sectorCount;
+		if (GLUtil.CAPS.OpenGL45) {
+			this.vbo = GL45.glCreateBuffers();
+			GL45.glNamedBufferStorage(this.vbo, size, GL44.GL_DYNAMIC_STORAGE_BIT);
+		} else if (GLUtil.CAPS.GL_ARB_direct_state_access) {
+			this.vbo = ARBDirectStateAccess.glCreateBuffers();
+			ARBDirectStateAccess.glNamedBufferStorage(this.vbo, size, GL44.GL_DYNAMIC_STORAGE_BIT);
+		} else if (GLUtil.CAPS.OpenGL44) {
+			this.vbo = GL15.glGenBuffers();
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
+			GL44.glBufferStorage(GL15.GL_ARRAY_BUFFER, size, GL44.GL_DYNAMIC_STORAGE_BIT);
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		} else if (GLUtil.CAPS.GL_ARB_buffer_storage) {
+			this.vbo = GL15.glGenBuffers();
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
+			ARBBufferStorage.glBufferStorage(GL15.GL_ARRAY_BUFFER, size, ARBBufferStorage.GL_DYNAMIC_STORAGE_BIT);
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		} else {
+			this.vbo = GL15.glGenBuffers();
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
+			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, size, GL15.GL_DYNAMIC_COPY);
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		}
 	}
 
 	public void addListener(Runnable listener) {
@@ -59,9 +83,16 @@ public class DynamicVBO {
 			throw new IllegalArgumentException();
 		}
 		Sector sector = this.sectors.claim(requiredSectors);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-		GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) sectorSize * sector.getFirstSector(), data);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		long offset = (long) sectorSize * sector.getFirstSector();
+		if (GLUtil.CAPS.OpenGL45) {
+			GL45.glNamedBufferSubData(this.vbo, offset, data);
+		} else if (GLUtil.CAPS.GL_ARB_direct_state_access) {
+			ARBDirectStateAccess.glNamedBufferSubData(this.vbo, offset, data);
+		} else {
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
+			GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, offset, data);
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		}
 		return new VBOPart(sector, size / this.vertexSize);
 	}
 
